@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Component</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="portfolio-container">
+        <!-- Circuit Board Background -->
+        <svg class="circuit-bg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <pattern id="circuitPattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                    <!-- Circuit traces -->
+                    <path d="M10,10 L90,10 L90,50 L50,50 L50,90" class="circuit-trace" fill="none" stroke-width="2"/>
+                    <path d="M10,90 L30,90 L30,70 L70,70 L70,30 L90,30" class="circuit-trace" fill="none" stroke-width="1.5"/>
+                    <!-- Circuit nodes -->
+                    <circle cx="10" cy="10" r="3" class="circuit-node"/>
+                    <circle cx="90" cy="50" r="2" class="circuit-node"/>
+                    <circle cx="50" cy="90" r="2.5" class="circuit-node"/>
+                </pattern>
+                
+                <!-- Glow filters -->
+                <filter id="glow-amber">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge> 
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                
+                <filter id="glow-cyan">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge> 
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            
+            <rect width="100%" height="100%" fill="url(#circuitPattern)" opacity="0.1"/>
+        </svg>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Header/Intro Section -->
+            <header class="portfolio-header" id="intro">
+                <div class="nixie-display">
+                    <h1 class="portfolio-title">CREATIVE PORTFOLIO</h1>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">READY TO INSPIRE</span>
+                    </div>
+                </div>
+                <div class="intro-content">
+                    <div class="intro-panel">
+                        <div class="intro-text">
+                            <div class="intro-line">
+                                <span class="prompt">></span>
+                                <span class="command">discover story</span>
+                            </div>
+                            <div class="output-text">
+                                <p>Welcome to my creative journey...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Projects Section -->
+            <section class="content-section" id="projects">
+                <div class="section-header">
+                    <h2 class="section-title">FEATURED WORK</h2>
+                    <div class="section-indicator">
+                        <span class="indicator-dot"></span>
+                        <span class="indicator-text">CREATIVE SHOWCASE</span>
+                    </div>
+                </div>
+                <div class="projects-grid">
+                    <!-- Projects will be loaded dynamically from XML -->
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section class="content-section" id="skills">
+                <div class="section-header">
+                    <h2 class="section-title">EXPERTISE</h2>
+                    <div class="section-indicator">
+                        <span class="indicator-dot"></span>
+                        <span class="indicator-text">CORE COMPETENCIES</span>
+                    </div>
+                </div>
+                <div class="skills-matrix">
+                    <!-- Skills will be loaded dynamically from XML -->
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="content-section" id="contact">
+                <div class="section-header">
+                    <h2 class="section-title">LET'S CONNECT</h2>
+                    <div class="section-indicator">
+                        <span class="indicator-dot"></span>
+                        <span class="indicator-text">START CONVERSATION</span>
+                    </div>
+                </div>
+                <div class="contact-panel">
+                    <div class="contact-display">
+                        <div class="contact-methods">
+                            <!-- Contact info will be loaded dynamically from XML -->
+                        </div>
+                    </div>
+                    
+                    <div class="oscilloscope">
+                        <canvas id="oscilloscope-canvas" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Ambient Effects -->
+        <div class="ambient-effects">
+            <div class="floating-particle" style="--delay: 0s; --duration: 8s;"></div>
+            <div class="floating-particle" style="--delay: 2s; --duration: 12s;"></div>
+            <div class="floating-particle" style="--delay: 4s; --duration: 10s;"></div>
+        </div>
+    </div>
+
+    <script src="xml-parser.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

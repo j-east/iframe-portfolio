@@ -1,0 +1,49 @@
+# GitHub Pages Configuration for iframe-portfolio
+
+# Site settings
+title: "Iframe Portfolio Component"
+description: "Embeddable portfolio component with warm analog tech aesthetic"
+url: "https://yourusername.github.io"
+baseurl: "/iframe-portfolio"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - LICENSE
+  - .gitignore
+  - iframe-test.html
+
+# Include files that start with underscores
+include:
+  - _config.yml
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# SEO and meta tags
+lang: en
+author: "Your Name"
+
+# GitHub Pages specific settings
+github:
+  repository_name: iframe-portfolio
+  repository_url: https://github.com/yourusername/iframe-portfolio
+
+# Custom variables for the portfolio
+portfolio:
+  version: "1.0.0"
+  last_updated: "2024-10-28"
+  features:
+    - "Analog tech aesthetic"
+    - "Circuit board animations"
+    - "Responsive design"
+    - "Interactive elements"
+    - "Oscilloscope effects"
+    - "Dynamic content updates"

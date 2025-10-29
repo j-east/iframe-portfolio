@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portfolio>
+    <meta>
+        <name>John Evans</name>
+        <tagline>Hardware Engineer • Software Developer • Maker</tagline>
+        <contact>
+            <github>j-east</github>
+            <email>jakepevans@gmail.com</email>
+        </contact>
+    </meta>
+
+    <project id="downeastaudio" featured="true">
+        <title>Downeast Audio</title>
+        <subtitle>High-Fidelity Bluetooth Speaker Company</subtitle>
+        <timeframe>Post-College Startup</timeframe>
+        <category>hardware,audio,manufacturing</category>
+        <description>
+            Founded and operated a high-fidelity bluetooth speaker company specializing in custom-designed products.
+        </description>
+        <highlights>
+            <highlight>Custom CNC-designed speaker cabinets</highlight>
+            <highlight>17 revisions of in-house circuit board design</highlight>
+            <highlight>Built custom Pick-and-Place machine with custom software for PCB assembly</highlight>
+            <highlight>Multiple design patents filed and granted (USPTO)</highlight>
+        </highlights>
+        <skills>PCB Design, CNC Manufacturing, Firmware Development, Audio Engineering, Product Design</skills>
+        <images>
+            <image rank="hero" description="Full product shot with rope handle - main portfolio image">downeastaudio_wooden-bluetooth-speaker_hero.webp</image>
+            <image rank="standard" description="Compass rose custom engraving - signature detail">downeastaudio_compass-engraving-back_standard.webp</image>
+            <image rank="standard" description="Close-up detail of speaker front">downeastaudio_front-view-detail_standard.webp</image>
+            <image rank="featured" description="Top view showing volume and bass controls">downeastaudio_control-panel-detail_feature.webp</image>
+            <image rank="featured" description="Speaker with dark blue/teal rope handle on foam">downeastaudio_mahogany-speaker-angle_feature.webp</image>
+            <image rank="featured" description="Back view with custom sailboat engraving">downeastaudio_sailboat-engraving-gift_feature.webp</image>
+            <image rank="standard" description="Side angle view of speaker">downeastaudio_top-view-closeup_standard.webp</image>
+            <image rank="featured" description="Purple amplifier PCB showing 20WPC silkscreen detail">downeastaudio_amplifier-pcb-detail_feature.webp</image>
+            <image rank="standard" description="Alternate controls detail shot">downeastaudio_control-panel-macro_standard.webp</image>
+            <image rank="standard" description="Red amplifier PCB layout design">downeastaudio_amplifier-pcb-layout_standard.webp</image>
+            <image rank="standard" description="Green PCB layout detail view">downeastaudio_pcb-design-detail_standard.webp</image>
+            <image rank="standard" description="Green PCB layout with component labels">downeastaudio_pcb-back-layout_standard.webp</image>
+            <image rank="standard" description="Wooden box with waterproof marine speakers">downeastaudio_waterproof-speaker-lifestyle_standard.webp</image>
+            <image rank="standard" description="Waterproof version control panel detail">downeastaudio_branding-closeup_standard.webp</image>
+            <image rank="standard" description="3D model of port connector">downeastaudio_port-connector-3d-model_standard.webp</image>
+            <image rank="standard" description="3D printed port connector">downeastaudio_port-connector-print_standard.webp</image>
+        </images>
+    </project>
+
+    <project id="circuit-assembly" featured="false">
+        <title>Downeast Circuit Assembly</title>
+        <subtitle>Contract PCB Assembly Service</subtitle>
+        <timeframe>Concurrent with Downeast Audio</timeframe>
+        <category>hardware,manufacturing,business</category>
+        <description>
+            Provided rapid-turnaround PCB assembly services for medical and aerospace startups.
+        </description>
+        <highlights>
+            <highlight>2-day turnaround time for complex assemblies</highlight>
+            <highlight>Handled advanced components including 0201 parts and BGA packages</highlight>
+            <highlight>Served medical and aerospace industries</highlight>
+        </highlights>
+        <skills>PCB Assembly, Quality Control, Customer Service, Precision Manufacturing</skills>
+        <images>
+            <image rank="featured" description="Custom pick-and-place machine for PCB assembly">circuit-assembly_pick-and-place-machine_feature.webp</image>
+            <image rank="featured" description="Purple PCB array showing multiple boards">circuit-assembly_purple-pcb-array_feature.webp</image>
+            <image rank="standard" description="Fine pitch connector assembly detail">circuit-assembly_fine-pitch-connector_standard.webp</image>
+            <image rank="standard" description="PCB closeup showing component detail">circuit-assembly_pcb-closeup_standard.webp</image>
+        </images>
+    </project>
+
+    <project id="jevons-camera" featured="true">
+        <title>JevonsCameraViewer</title>
+        <subtitle>Machine Vision Research Tool</subtitle>
+        <timeframe>Open Source Project</timeframe>
+        <category>software,computer-vision,open-source</category>
+        <links>
+            <link type="github" label="GitHub Repository">https://github.com/j-east/JevonsCameraViewer</link>
+            <link type="hackaday" label="Hackaday Feature">https://hackaday.io/project/jevons-camera</link>
+        </links>
+        <description>
+            Open-source machine vision research tool designed for sharing research rather than as a product. Featured on Hackaday.
+        </description>
+        <highlights>
+            <highlight>150+ stars on GitHub</highlight>
+            <highlight>Successfully implemented eye tracking</highlight>
+            <highlight>Featured on Hackaday</highlight>
+            <highlight>Built for research community collaboration</highlight>
+        </highlights>
+        <skills>Computer Vision, OpenCV, Eye Tracking, Open Source Development</skills>
+        <images>
+            <image rank="featured" description="Professional portrait wearing eye tracking glasses">jevons-camera_head-mounted-prototype_feature.webp</image>
+            <image rank="featured" description="Eye gaze tracking demonstration with outdoor scene">jevons-camera_gaze-indicator-demo_feature.webp</image>
+            <image rank="featured" description="Cornea reflection tracking view with interface">jevons-camera_eye-gaze-interface_feature.webp</image>
+            <image rank="standard" description="Person wearing eye tracking glasses hardware">jevons-camera_eyetracking-glasses-hardware_standard.webp</image>
+            <image rank="featured" description="Eye tracking camera hardware prototype on safety glasses">jevons-camera_glasses-mounted-system_feature.webp</image>
+        </images>
+    </project>
+
+    <project id="parachute-altimeter" featured="true">
+        <title>Advanced Parachute Altimeter Watch</title>
+        <subtitle>Multi-Sensor Wearable with Vector Map Display</subtitle>
+        <timeframe>Personal R&amp;D Project</timeframe>
+        <category>hardware,firmware,gis,wearable</category>
+        <description>
+            Custom-designed wearable altimeter for parachuting operations, later pivoted to sailing navigation. Features advanced GIS rendering and multi-sensor integration.
+        </description>
+        <highlights>
+            <highlight>Custom NRF52840-based circuit board design</highlight>
+            <highlight>Multi-sensor integration: barometric altimeter, IMU, GPS, temperature, humidity</highlight>
+            <highlight>Lithium polymer battery management system</highlight>
+            <highlight>Sharp 400x270px memory LCD display</highlight>
+            <highlight>Custom GIS rendering engine: compressed vector maps from OSM data</highlight>
+            <highlight>Multi-resolution map rendering with dynamic zoom levels</highlight>
+            <highlight>Bluetooth sync with mobile app for track data and map updates</highlight>
+            <highlight>NOAA ENC nautical chart interpretation for sailing mode</highlight>
+            <highlight>Dynamic text and symbol rendering based on display mode</highlight>
+        </highlights>
+        <skills>Embedded Systems, nRF52 Development, Battery Management, GIS/Mapping, OSM Data Processing, NOAA ENC, Display Drivers, Bluetooth LE, Firmware Optimization</skills>
+        <images>
+            <image rank="standard" description="PCB with colorful ribbon cable">parachute-altimeter_dev-board-ribbon-cable_standard.webp</image>
+            <image rank="standard" description="Multiple PCBs on workbench during assembly">parachute-altimeter_altimeter-pcb-cable_standard.webp</image>
+            <image rank="standard" description="Purple PCB held in hand showing components">parachute-altimeter_stacked-module-side_standard.webp</image>
+            <image rank="hero" description="Micro PCB detail with penny for scale">parachute-altimeter_stacked-pcb-module_hero.webp</image>
+            <image rank="featured" description="PCB with display module and header pins">parachute-altimeter_wrist-display-map_feature.webp</image>
+            <image rank="standard" description="Florida OSM vector map rendering demonstration">parachute-altimeter_florida-vector-map_standard.webp</image>
+            <image rank="standard" description="Detailed Maine coastline map with vector data">parachute-altimeter_maine-coastline-gis_standard.webp</image>
+            <image rank="standard" description="Florida map with nautical depth rendering">parachute-altimeter_florida-render-presentation_standard.webp</image>
+        </images>
+    </project>
+
+    <project id="sailboat-refit" featured="true">
+        <title>Complete Sailboat Systems Refit</title>
+        <subtitle>40+ Projects: Electrical, Mechanical, and Cruising Preparation</subtitle>
+        <timeframe>Multi-Year Project</timeframe>
+        <category>marine,electrical,mechanical,cruising</category>
+        <description>
+            Complete restoration and modernization of a cruising sailboat, including major electrical, mechanical, and systems upgrades. Sailed from Tampa, FL to Grenada via the Bahamas and Caribbean.
+        </description>
+        <highlights>
+            <highlight type="electrical">400W solar system installation</highlight>
+            <highlight type="electrical">Xantrex inverter/charger integration</highlight>
+            <highlight type="electrical">LiFePO4 battery bank design and installation</highlight>
+            <highlight type="electrical">Complete 115V AC system rewiring</highlight>
+            <highlight type="electrical">LED lighting conversion throughout</highlight>
+            <highlight type="electrical">Marine sensor network reorganization and accessibility improvements</highlight>
+            
+            <highlight type="mechanical">Engine wet muffler and exhaust system replacement</highlight>
+            <highlight type="mechanical">Engine mount replacement</highlight>
+            <highlight type="mechanical">Complete fuel line and filter system replacement</highlight>
+            <highlight type="mechanical">Generator raw water pump system rebuild</highlight>
+            <highlight type="mechanical">Air conditioning circulatory pump and bleed line installation</highlight>
+            
+            <highlight type="electronics">Radar repair: complete signal wire replacement</highlight>
+            <highlight type="electronics">Refrigerator/freezer digital conversion</highlight>
+            <highlight type="electronics">Starlink satellite internet with custom transom mount</highlight>
+            
+            <highlight type="deck">Stanchion and railing repairs</highlight>
+            <highlight type="deck">Canvas and sail cover rebuilds</highlight>
+            <highlight type="deck">Sprayhood addition</highlight>
+            <highlight type="deck">Windlass gearbox replacement with improved serviceability</highlight>
+            <highlight type="deck">Boom gooseneck replacement</highlight>
+            <highlight type="deck">Boom mainsheet block mount replacement</highlight>
+            <highlight type="deck">Traveler bearing replacement</highlight>
+            <highlight type="deck">Mainsail cover and lazy jack replacement</highlight>
+            
+            <highlight type="interior">Custom cabinetry for aft storage compartments</highlight>
+            <highlight type="interior">Folding salon table with center storage and bed conversion</highlight>
+            <highlight type="interior">Built-in grill installation</highlight>
+            
+            <highlight type="cruising">Tampa to Jacksonville</highlight>
+            <highlight type="cruising">Jacksonville to Abacos, Bahamas</highlight>
+            <highlight type="cruising">Abacos to St. Augustine</highlight>
+            <highlight type="cruising">St. Augustine to Little Deer Isle, Maine</highlight>
+            <highlight type="cruising">Return to Jacksonville</highlight>
+            <highlight type="cruising">Jacksonville to St. Croix via Bahamas, Turks and Caicos, Dominican Republic, Puerto Rico</highlight>
+            <highlight type="cruising">St. Croix to Grenada via St. Martin, St. Barths, Mt. Serrat, Guadeloupe, Les Saintes, Dominica, Martinique, St. Lucia, St. Vincent and the Grenadines</highlight>
+        </highlights>
+        <skills>Marine Electrical Systems, Marine Plumbing, Marine Refrigeration, Diesel Mechanics, Fiberglass Work, Woodworking, Rigging, Navigation, Offshore Passage Making, Solar Power Systems, Marine Electronics, LiFePO4 Systems</skills>
+        <images>
+            <image rank="hero" description="Custom teak table with geometric inlay">sailboat-refit_custom-teak-table_hero.webp</image>
+            <image rank="featured" description="Salon interior wide view">sailboat-refit_salon-interior-wide_feature.webp</image>
+        </images>
+    </project>
+
+    <project id="fabernovus" featured="true">
+        <title>FaberNovus</title>
+        <subtitle>Multi-Party AI Chat with RAG System</subtitle>
+        <timeframe>Current Development</timeframe>
+        <category>software,ai,web</category>
+        <description>
+            Advanced multi-party AI chat application featuring document management and Retrieval-Augmented Generation (RAG) for contextual conversations.
+        </description>
+        <highlights>
+            <highlight>Multi-party conversation support</highlight>
+            <highlight>RAG system for context-aware responses</highlight>
+            <highlight>Document management integration</highlight>
+            <highlight>Custom retrieval and embedding pipeline</highlight>
+        </highlights>
+        <skills>LLM Integration, RAG Architecture, Vector Databases, Full-Stack Development, Document Processing</skills>
+    </project>
+
+    <project id="artwork-furniture" featured="true">
+        <title>Artwork &amp; Furniture</title>
+        <subtitle>Oil Paintings and Custom Woodworking</subtitle>
+        <timeframe>Ongoing</timeframe>
+        <category>art,woodworking,making</category>
+        <description>
+            Collection of original oil paintings and custom furniture pieces, demonstrating craftsmanship and artistic expression alongside technical work.
+        </description>
+        <highlights>
+            <highlight>20+ original oil paintings on canvas</highlight>
+            <highlight>Custom furniture designs and builds</highlight>
+            <highlight>Traditional woodworking and finishing techniques</highlight>
+        </highlights>
+        <skills>Oil Painting, Woodworking, Furniture Design, Traditional Joinery, Finishing</skills>
+        <images>
+            <image rank="featured" description="Custom wood table with geometric inlay pattern">artwork-furniture_geometric-wood-table_feature.webp</image>
+            <image rank="hero" description="Swamp sunset painting">artwork-furniture_swamp-sunset-painting_hero.webp</image>
+            <image rank="standard" description="Alien mountains sailboat painting">artwork-furniture_alien-mountains-sailboat_standard.webp</image>
+            <image rank="standard" description="Beach waves seagulls painting">artwork-furniture_beach-waves-seagulls_standard.webp</image>
+            <image rank="standard" description="Coastal cabin landscape painting">artwork-furniture_coastal-cabin-landscape_standard.webp</image>
+            <image rank="standard" description="Coastal overlook with dog painting">artwork-furniture_coastal-overlook-with-dog_standard.webp</image>
+            <image rank="standard" description="Dramatic sunset seascape painting">artwork-furniture_dramatic-sunset-seascape_standard.webp</image>
+            <image rank="standard" description="Golf swing sight closeup">artwork-furniture_golf-swing-sight-closeup_standard.webp</image>
+            <image rank="standard" description="Golf swing sight tool">artwork-furniture_golf-swing-sight-tool_standard.webp</image>
+            <image rank="standard" description="Pelicans sailboats beach painting">artwork-furniture_pelicans-sailboats-beach_standard.webp</image>
+            <image rank="standard" description="Racing sailboats painting">artwork-furniture_racing-sailboats_standard.webp</image>
+            <image rank="standard" description="Sailboat mountains painting">artwork-furniture_sailboat-mountains-painting_standard.webp</image>
+            <image rank="standard" description="Sailboat sunset painting">artwork-furniture_sailboat-sunset-painting_standard.webp</image>
+            <image rank="standard" description="Schooner sunset reflection painting">artwork-furniture_schooner-sunset-reflection_standard.webp</image>
+            <image rank="standard" description="Snowy mountains painting">artwork-furniture_snowy-mountains-painting_standard.webp</image>
+            <image rank="standard" description="Stormy sailboat painting">artwork-furniture_stormy-sailboat_standard.webp</image>
+            <image rank="standard" description="Tropical beach painting">artwork-furniture_tropical-beach-painting_standard.webp</image>
+            <image rank="standard" description="White sails painting">artwork-furniture_white-sails-painting_standard.webp</image>
+        </images>
+    </project>
+
+    <interlude id="fintech-pause">
+        <title>Financial Technology Position</title>
+        <timeframe>Several Years</timeframe>
+        <note>Worked in financial technology sector. Development on personal projects paused due to role demands and COVID-19 supply chain disruptions.</note>
+    </interlude>
+
+</portfolio>

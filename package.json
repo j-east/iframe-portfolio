@@ -1,0 +1,52 @@
+{
+  "name": "iframe-portfolio",
+  "version": "1.0.0",
+  "description": "Embeddable portfolio component with warm analog tech aesthetic",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Open http://localhost:8000/iframe-test.html to test the component\" && exit 0",
+    "build": "echo \"No build process needed - static files\" && exit 0",
+    "deploy": "echo \"Push to main branch for GitHub Pages deployment\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/iframe-portfolio.git"
+  },
+  "keywords": [
+    "portfolio",
+    "iframe",
+    "embeddable",
+    "component",
+    "analog-tech",
+    "circuit-board",
+    "responsive",
+    "github-pages",
+    "web-component"
+  ],
+  "author": "John Evans <jakepevans@gmail.com>",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/j-east/iframe-portfolio/issues"
+  },
+  "homepage": "https://j-east.github.io/iframe-portfolio/",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "files": [
+    "index.html",
+    "styles.css",
+    "script.js",
+    "README.md",
+    "LICENSE"
+  ]
+}

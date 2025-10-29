@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    
+    <!-- Root Element -->
+    <xs:element name="portfolio">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="meta" type="MetaType"/>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element name="project" type="ProjectType"/>
+                    <xs:element name="interlude" type="InterludeType"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Meta Information -->
+    <xs:complexType name="MetaType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="tagline" type="xs:string"/>
+            <xs:element name="contact" type="ContactType"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="ContactType">
+        <xs:sequence>
+            <xs:element name="github" type="xs:string"/>
+            <xs:element name="email" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Project Type -->
+    <xs:complexType name="ProjectType">
+        <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="subtitle" type="xs:string"/>
+            <xs:element name="timeframe" type="xs:string"/>
+            <xs:element name="category" type="xs:string"/>
+            <xs:element name="links" type="LinksType" minOccurs="0"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="highlights" type="HighlightsType"/>
+            <xs:element name="skills" type="xs:string"/>
+            <xs:choice minOccurs="0">
+                <xs:element name="images" type="ImagesType"/>
+                <xs:element name="gallery" type="GalleryType"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="featured" type="xs:boolean" use="required"/>
+    </xs:complexType>
+    
+    <!-- Links Type - Flexible for any link type -->
+    <xs:complexType name="LinksType">
+        <xs:sequence>
+            <xs:element name="link" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="type" type="xs:string" use="required"/>
+                            <xs:attribute name="label" type="xs:string" use="optional"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Highlights Type -->
+    <xs:complexType name="HighlightsType">
+        <xs:sequence>
+            <xs:element name="highlight" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="type" type="xs:string" use="optional"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Images Type -->
+    <xs:complexType name="ImagesType">
+        <xs:sequence>
+            <xs:element name="image" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Gallery Type (for artwork/furniture) -->
+    <xs:complexType name="GalleryType">
+        <xs:sequence>
+            <xs:element name="item" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="type" type="xs:string" use="required"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Interlude Type (for career breaks, etc.) -->
+    <xs:complexType name="InterludeType">
+        <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="timeframe" type="xs:string"/>
+            <xs:element name="note" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+    
+</xs:schema>
