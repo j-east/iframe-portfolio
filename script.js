@@ -761,9 +761,22 @@ class PortfolioController {
         Object.keys(contact).forEach(method => {
             const contactItem = document.createElement('div');
             contactItem.className = 'contact-item';
+            
+            let contactValueHtml;
+            if (method === 'email') {
+                contactValueHtml = `<span class="contact-value">${contact[method]}</span>`;
+            } else if (method === 'github') {
+                contactValueHtml = `<a href="https://${contact[method]}" target="_blank" class="contact-value contact-link">${contact[method]}</a>`;
+            } else if (method === 'linkedin') {
+                const displayUrl = contact[method].replace('https://', '').replace('http://', '');
+                contactValueHtml = `<a href="${contact[method]}" target="_blank" class="contact-value contact-link">${displayUrl}</a>`;
+            } else {
+                contactValueHtml = `<span class="contact-value">${contact[method]}</span>`;
+            }
+            
             contactItem.innerHTML = `
                 <span class="contact-label">${method.toUpperCase()}:</span>
-                <span class="contact-value">${contact[method]}</span>
+                ${contactValueHtml}
             `;
             contactMethods.appendChild(contactItem);
         });

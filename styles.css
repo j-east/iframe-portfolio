@@ -643,6 +643,25 @@ body {
     0 0 2.5px rgba(204, 136, 68, 0.2);
 }
 
+a.contact-link {
+  color: var(--cathode-cyan) !important;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-shadow:
+    0 0 0.5px rgba(102, 255, 255, 0.6),
+    0 0 1.5px rgba(102, 255, 255, 0.4),
+    0 0 2.5px rgba(102, 255, 255, 0.2);
+}
+
+a.contact-link:hover {
+  color: var(--copper) !important;
+  text-shadow:
+    0 0 0.5px rgba(255, 179, 102, 0.8),
+    0 0 1.5px rgba(255, 153, 102, 0.6),
+    0 0 2.5px rgba(204, 136, 68, 0.4);
+  filter: var(--glow-copper);
+}
+
 /* Oscilloscope */
 .oscilloscope {
   background: var(--black);

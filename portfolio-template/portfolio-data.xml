@@ -3,11 +3,42 @@
     <meta>
         <name>John Evans</name>
         <tagline>Hardware Engineer • Software Developer • Maker</tagline>
+        <description>Passionate about creating innovative solutions and bringing ideas to life through engineering and code.</description>
         <contact>
             <github>j-east</github>
             <email>jakepevans@gmail.com</email>
+            <linkedin>https://www.linkedin.com/in/john-evans-81934987/</linkedin>
         </contact>
     </meta>
+
+    <skills>
+        <summary>C# .NET 8/9, Angular 19, TypeScript, JavaScript, HTML, SCSS/CSS, C/C++ Embedded Systems, KiCad/Eagle/Altium, SolidWorks/AutoCAD/Fusion360, Navigation, Sailing</summary>
+        
+        <programming_languages>
+            <skill name="C#" years="10" proficiency="expert" frameworks=".NET 8/9, ASP.NET MVC, Entity Framework" contexts="Enterprise software, Embedded systems, Financial systems"/>
+            <skill name="TypeScript" years="6" proficiency="advanced" frameworks="Angular 19, Node.js" contexts="Frontend development, AI interfaces, Trading platforms"/>
+            <skill name="JavaScript" years="6" proficiency="advanced" contexts="Frontend development, Web applications, Interactive interfaces"/>
+            <skill name="C/C++" years="8" proficiency="advanced" platforms="nRF52840, Teensy, Arduino, PIC" contexts="Embedded systems, Microcontroller programming, Hardware interfaces"/>
+            <skill name="SQL" years="8" proficiency="advanced" variants="SQL Server, PostgreSQL, T-SQL" contexts="Database design, Complex queries, Performance optimization"/>
+            <skill name="HTML/CSS/SCSS" years="6" proficiency="advanced" contexts="Web development, Responsive design, UI/UX implementation"/>
+        </programming_languages>
+        
+        <technical_domains>
+            <domain name="Financial Technology" years="7" level="expert" description="7+ years at SS&amp;C Advent in investment management software, market data processing, tax compliance systems"/>
+            <domain name="Embedded Systems" years="8" level="expert" description="Medical devices, audio equipment, navigation hardware, drone systems using nRF52840, Teensy, Arduino platforms"/>
+            <domain name="Hardware Design" years="6" level="advanced" description="PCB design with KiCad/Eagle/Altium, 3D modeling with SolidWorks/AutoCAD/Fusion360, audio amplifiers, power conversion"/>
+            <domain name="Computer Vision" years="4" level="advanced" description="Eye tracking systems, multi-camera processing, 154-star GitHub project, featured on Hackaday"/>
+            <domain name="AI/ML" years="2" level="advanced" description="AI communication platforms, transparent AI systems, FaberNovus platform development"/>
+            <domain name="Maritime Navigation" years="2" level="advanced" description="Custom GIS software, NOAA ENC chart integration, GPS wristwatch with map view and telemetry"/>
+        </technical_domains>
+        
+        <specialized_skills>
+            <skill name="Navigation" years="2" proficiency="advanced" contexts="Marine navigation, Offshore passage making, Chart plotting and GPS systems"/>
+            <skill name="Sailing" years="5" proficiency="expert" contexts="Offshore cruising, Caribbean sailing, Boat systems and maintenance"/>
+            <skill name="Manufacturing" years="4" proficiency="advanced" contexts="PCB assembly, Quality control, Supply chain management"/>
+            <skill name="Business Development" years="3" proficiency="advanced" contexts="Client relationship management, Contract negotiation, Technical communication"/>
+        </specialized_skills>
+    </skills>
 
     <project id="downeastaudio" featured="true">
         <title>Downeast Audio</title>

@@ -36,6 +36,7 @@ class PortfolioXMLParser {
         
         const data = {
             meta: this.parseMeta(portfolio.querySelector('meta')),
+            skills: this.parseSkills(portfolio.querySelector('skills')),
             projects: this.parseProjects(portfolio.querySelectorAll('project')),
             interludes: this.parseInterludes(portfolio.querySelectorAll('interlude'))
         };
@@ -49,9 +50,11 @@ class PortfolioXMLParser {
         return {
             name: this.getElementText(metaElement, 'name'),
             tagline: this.getElementText(metaElement, 'tagline'),
+            description: this.getElementText(metaElement, 'description'),
             contact: {
                 github: this.getElementText(metaElement, 'contact github'),
-                email: this.getElementText(metaElement, 'contact email')
+                email: this.getElementText(metaElement, 'contact email'),
+                linkedin: this.getElementText(metaElement, 'contact linkedin')
             }
         };
     }
@@ -75,6 +78,44 @@ class PortfolioXMLParser {
             
             return projectData;
         });
+    }
+    
+    parseSkills(skillsElement) {
+        if (!skillsElement) return null;
+        
+        return {
+            summary: this.getElementText(skillsElement, 'summary'),
+            programming_languages: this.parseSkillItems(skillsElement.querySelector('programming_languages')),
+            technical_domains: this.parseDomainItems(skillsElement.querySelector('technical_domains')),
+            specialized_skills: this.parseSkillItems(skillsElement.querySelector('specialized_skills'))
+        };
+    }
+    
+    parseSkillItems(skillsContainer) {
+        if (!skillsContainer) return [];
+        
+        const skills = skillsContainer.querySelectorAll('skill');
+        return Array.from(skills).map(skill => ({
+            name: skill.getAttribute('name'),
+            years: skill.getAttribute('years'),
+            proficiency: skill.getAttribute('proficiency'),
+            frameworks: skill.getAttribute('frameworks'),
+            platforms: skill.getAttribute('platforms'),
+            variants: skill.getAttribute('variants'),
+            contexts: skill.getAttribute('contexts')
+        }));
+    }
+    
+    parseDomainItems(domainsContainer) {
+        if (!domainsContainer) return [];
+        
+        const domains = domainsContainer.querySelectorAll('domain');
+        return Array.from(domains).map(domain => ({
+            name: domain.getAttribute('name'),
+            years: domain.getAttribute('years'),
+            level: domain.getAttribute('level'),
+            description: domain.getAttribute('description')
+        }));
     }
     
     parseInterludes(interludeElements) {
@@ -146,11 +187,11 @@ class PortfolioXMLParser {
             title: meta.name.toUpperCase(),
             about: this.generateAboutHTML(meta),
             projects: this.convertProjectsFormat(projects.filter(p => p.featured)),
-            skills: this.generateSkillsFromProjects(projects),
+            skills: this.portfolioData.skills ? this.convertSkillsFormat(this.portfolioData.skills) : this.generateSkillsFromProjects(projects),
             contact: {
                 email: meta.contact.email,
                 github: 'github.com/' + meta.contact.github,
-                linkedin: 'linkedin.com/in/' + meta.contact.github // Fallback
+                linkedin: meta.contact.linkedin || null
             }
         };
     }
@@ -159,7 +200,7 @@ class PortfolioXMLParser {
         return `
             <p>Hello! I'm ${meta.name}.</p>
             <p>${meta.tagline}</p>
-            <p class="highlight">Passionate about creating innovative solutions and bringing ideas to life through engineering and code.</p>
+            <p class="highlight">${meta.description || 'Passionate about creating innovative solutions and bringing ideas to life through engineering and code.'}</p>
         `;
     }
     
@@ -174,8 +215,33 @@ class PortfolioXMLParser {
         }));
     }
     
+    convertSkillsFormat(skillsData) {
+        // Convert structured skills data to format expected by existing portfolio component
+        const programming = skillsData.programming_languages || [];
+        const domains = skillsData.technical_domains || [];
+        const specialized = skillsData.specialized_skills || [];
+        
+        return {
+            programming: programming.map(skill => ({
+                name: skill.name,
+                level: skill.proficiency === 'expert' ? 95 :
+                       skill.proficiency === 'advanced' ? 85 : 75
+            })),
+            domains: domains.map(domain => ({
+                name: domain.name,
+                level: domain.level === 'expert' ? 95 :
+                       domain.level === 'advanced' ? 85 : 75
+            })),
+            specialized: specialized.map(skill => ({
+                name: skill.name,
+                level: skill.proficiency === 'expert' ? 95 :
+                       skill.proficiency === 'advanced' ? 85 : 75
+            }))
+        };
+    }
+    
     generateSkillsFromProjects(projects) {
-        const allSkills = projects.flatMap(p => 
+        const allSkills = projects.flatMap(p =>
             p.skills.split(',').map(s => s.trim())
         );
         
@@ -192,11 +258,11 @@ class PortfolioXMLParser {
             }));
         
         // Group into categories (simplified)
-        const frontend = sortedSkills.filter(s => 
+        const frontend = sortedSkills.filter(s =>
             ['JavaScript', 'HTML', 'CSS', 'React', 'Vue.js', 'Web Development'].includes(s.name)
         ).slice(0, 4);
         
-        const backend = sortedSkills.filter(s => 
+        const backend = sortedSkills.filter(s =>
             ['Node.js', 'Python', 'C/C++', 'Embedded Systems', 'Firmware Development'].includes(s.name)
         ).slice(0, 4);
         
@@ -291,7 +357,7 @@ if (typeof window !== 'undefined') {
         populateProjectsSection(data.projects.filter(p => p.featured), this);
         
         // Populate skills section
-        populateSkillsSection(data.projects);
+        populateSkillsSection(data.skills, data.projects);
         
         // Populate contact section
         populateContactSection(data.meta.contact);
@@ -303,7 +369,7 @@ if (typeof window !== 'undefined') {
             outputText.innerHTML = `
                 <p>Hello! I'm ${meta.name}.</p>
                 <p>${meta.tagline}</p>
-                <p class="highlight">Passionate about creating innovative solutions and bringing ideas to life through engineering and code.</p>
+                <p class="highlight">${meta.description || 'Passionate about creating innovative solutions and bringing ideas to life through engineering and code.'}</p>
             `;
         }
     }
@@ -398,57 +464,133 @@ if (typeof window !== 'undefined') {
         });
     }
     
-    function populateSkillsSection(projects) {
+    function populateSkillsSection(skillsData, projects) {
         const skillsMatrix = document.querySelector('.skills-matrix');
-        if (!skillsMatrix || !projects.length) return;
-        
-        // Extract and categorize skills
-        const allSkills = projects.flatMap(p =>
-            p.skills.split(',').map(s => s.trim())
-        );
-        
-        const skillCounts = {};
-        allSkills.forEach(skill => {
-            skillCounts[skill] = (skillCounts[skill] || 0) + 1;
-        });
-        
-        // Categorize skills
-        const categories = {
-            'HARDWARE': ['PCB Design', 'CNC Manufacturing', 'Embedded Systems', 'nRF52 Development', 'Battery Management', 'Power Electronics', 'Audio Engineering', 'Marine Electrical Systems', 'Diesel Mechanics'],
-            'SOFTWARE': ['JavaScript', 'Python', 'C/C++', 'React', 'Vue.js', 'Node.js', 'Web Development', 'Computer Vision', 'OpenCV', 'LLM Integration', 'RAG Architecture'],
-            'ENGINEERING': ['Product Design', 'Mechanical Design', 'Fusion 360', 'CAD', 'GIS/Mapping', 'Firmware Development', 'System Architecture', 'Manufacturing']
-        };
+        if (!skillsMatrix) return;
         
         skillsMatrix.innerHTML = '';
         
-        Object.entries(categories).forEach(([categoryName, categorySkills]) => {
-            const relevantSkills = categorySkills
-                .filter(skill => skillCounts[skill])
-                .map(skill => ({
-                    name: skill,
-                    level: Math.min(95, 60 + (skillCounts[skill] * 15))
-                }))
-                .slice(0, 4);
-            
-            if (relevantSkills.length > 0) {
+        // If we have structured skills data, use it
+        if (skillsData && skillsData.programming_languages) {
+            // Programming Languages
+            if (skillsData.programming_languages.length > 0) {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'skill-category';
                 categoryDiv.innerHTML = `
-                    <h3 class="category-title">${categoryName}</h3>
+                    <h3 class="category-title">PROGRAMMING</h3>
                     <div class="skill-bars">
-                        ${relevantSkills.map(skill => `
-                            <div class="skill-item">
-                                <span class="skill-name">${skill.name}</span>
-                                <div class="skill-bar">
-                                    <div class="skill-progress" data-level="${skill.level}"></div>
+                        ${skillsData.programming_languages.map(skill => {
+                            const level = skill.proficiency === 'expert' ? 95 :
+                                         skill.proficiency === 'advanced' ? 85 : 75;
+                            return `
+                                <div class="skill-item">
+                                    <span class="skill-name">${skill.name}</span>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-level="${level}"></div>
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 `;
                 skillsMatrix.appendChild(categoryDiv);
             }
-        });
+            
+            // Technical Domains
+            if (skillsData.technical_domains && skillsData.technical_domains.length > 0) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'skill-category';
+                categoryDiv.innerHTML = `
+                    <h3 class="category-title">TECHNICAL DOMAINS</h3>
+                    <div class="skill-bars">
+                        ${skillsData.technical_domains.slice(0, 4).map(domain => {
+                            const level = domain.level === 'expert' ? 95 :
+                                         domain.level === 'advanced' ? 85 : 75;
+                            return `
+                                <div class="skill-item">
+                                    <span class="skill-name">${domain.name}</span>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-level="${level}"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                skillsMatrix.appendChild(categoryDiv);
+            }
+            
+            // Specialized Skills
+            if (skillsData.specialized_skills && skillsData.specialized_skills.length > 0) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'skill-category';
+                categoryDiv.innerHTML = `
+                    <h3 class="category-title">SPECIALIZED</h3>
+                    <div class="skill-bars">
+                        ${skillsData.specialized_skills.map(skill => {
+                            const level = skill.proficiency === 'expert' ? 95 :
+                                         skill.proficiency === 'advanced' ? 85 : 75;
+                            return `
+                                <div class="skill-item">
+                                    <span class="skill-name">${skill.name}</span>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-level="${level}"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                skillsMatrix.appendChild(categoryDiv);
+            }
+        } else {
+            // Fallback to project-based skills extraction
+            if (!projects || !projects.length) return;
+            
+            const allSkills = projects.flatMap(p =>
+                p.skills.split(',').map(s => s.trim())
+            );
+            
+            const skillCounts = {};
+            allSkills.forEach(skill => {
+                skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+            });
+            
+            const categories = {
+                'HARDWARE': ['PCB Design', 'CNC Manufacturing', 'Embedded Systems', 'nRF52 Development', 'Battery Management'],
+                'SOFTWARE': ['JavaScript', 'Python', 'C/C++', 'React', 'Vue.js', 'Node.js', 'Computer Vision'],
+                'ENGINEERING': ['Product Design', 'Mechanical Design', 'Fusion 360', 'CAD', 'GIS/Mapping']
+            };
+            
+            Object.entries(categories).forEach(([categoryName, categorySkills]) => {
+                const relevantSkills = categorySkills
+                    .filter(skill => skillCounts[skill])
+                    .map(skill => ({
+                        name: skill,
+                        level: Math.min(95, 60 + (skillCounts[skill] * 15))
+                    }))
+                    .slice(0, 4);
+                
+                if (relevantSkills.length > 0) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'skill-category';
+                    categoryDiv.innerHTML = `
+                        <h3 class="category-title">${categoryName}</h3>
+                        <div class="skill-bars">
+                            ${relevantSkills.map(skill => `
+                                <div class="skill-item">
+                                    <span class="skill-name">${skill.name}</span>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-level="${skill.level}"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    skillsMatrix.appendChild(categoryDiv);
+                }
+            });
+        }
     }
     
     function populateContactSection(contact) {
@@ -462,8 +604,14 @@ if (typeof window !== 'undefined') {
             </div>
             <div class="contact-item">
                 <span class="contact-label">GITHUB:</span>
-                <span class="contact-value">github.com/${contact.github}</span>
+                <a href="https://github.com/${contact.github}" target="_blank" class="contact-value contact-link">github.com/${contact.github}</a>
             </div>
+            ${contact.linkedin ? `
+            <div class="contact-item">
+                <span class="contact-label">LINKEDIN:</span>
+                <a href="${contact.linkedin}" target="_blank" class="contact-value contact-link">${contact.linkedin.replace('https://', '').replace('http://', '')}</a>
+            </div>
+            ` : ''}
         `;
     }
     
