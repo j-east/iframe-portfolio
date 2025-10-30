@@ -197,6 +197,31 @@
         </images>
     </project>
 
+    <project id="3dtraining-golf" featured="true">
+        <title>3D Golf: Swing Sight</title>
+        <subtitle>Revolutionary Golf Swing Alignment Tool</subtitle>
+        <timeframe>Current Development</timeframe>
+        <category>hardware,3d-printing,sports,manufacturing</category>
+        <links>
+            <link type="website" label="3dtraining.golf">https://3dtraining.golf</link>
+        </links>
+        <description>
+            Designed and developed the Swing Sight, a revolutionary 3D printed golf alignment tool that transforms your golf game by eliminating the two most common swing killers: hip sway and over-the-top club path. Patent pending innovation that promotes proper rotation and club path for consistent contact and lower scores.
+        </description>
+        <highlights>
+            <highlight>Patent pending golf swing alignment technology</highlight>
+            <highlight>3D printed precision manufacturing</highlight>
+            <highlight>Eliminates hip sway and over-the-top club path</highlight>
+            <highlight>Promotes proper rotation for consistent contact</highlight>
+            <highlight>Professional-grade training tool design</highlight>
+        </highlights>
+        <skills>3D Design, 3D Printing, Product Development, Sports Equipment Design, Manufacturing, Patent Filing</skills>
+        <images>
+            <image rank="featured" description="Close-up detail of the Swing Sight alignment tool">3dtraining-golf_swing-sight-closeup_standard.webp</image>
+            <image rank="standard" description="Full view of the Swing Sight training tool">3dtraining-golf_swing-sight-tool_standard.webp</image>
+        </images>
+    </project>
+
     <project id="artwork-furniture" featured="true">
         <title>Artwork &amp; Furniture</title>
         <subtitle>Oil Paintings and Custom Woodworking</subtitle>
@@ -219,8 +244,6 @@
             <image rank="standard" description="Coastal cabin landscape painting">artwork-furniture_coastal-cabin-landscape_standard.webp</image>
             <image rank="standard" description="Coastal overlook with dog painting">artwork-furniture_coastal-overlook-with-dog_standard.webp</image>
             <image rank="standard" description="Dramatic sunset seascape painting">artwork-furniture_dramatic-sunset-seascape_standard.webp</image>
-            <image rank="standard" description="Golf swing sight closeup">artwork-furniture_golf-swing-sight-closeup_standard.webp</image>
-            <image rank="standard" description="Golf swing sight tool">artwork-furniture_golf-swing-sight-tool_standard.webp</image>
             <image rank="standard" description="Pelicans sailboats beach painting">artwork-furniture_pelicans-sailboats-beach_standard.webp</image>
             <image rank="standard" description="Racing sailboats painting">artwork-furniture_racing-sailboats_standard.webp</image>
             <image rank="standard" description="Sailboat mountains painting">artwork-furniture_sailboat-mountains-painting_standard.webp</image>
