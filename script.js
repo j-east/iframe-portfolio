@@ -17,6 +17,7 @@ class PortfolioController {
         this.setupAmbientEffects();
         this.setupResponsiveHandling();
         this.setupScrollAnimations();
+        this.setupBackButtonHandling();
         
         // Initialize animations
         this.triggerSectionAnimation('intro');
@@ -364,7 +365,26 @@ class PortfolioController {
         if (overlay) {
             overlay.style.display = 'none';
             document.body.style.overflow = ''; // Restore scrolling
+            
+            // Remove the history state if it was added
+            if (this.modalHistoryState) {
+                history.back();
+                this.modalHistoryState = false;
+            }
         }
+    }
+    
+    setupBackButtonHandling() {
+        // Handle browser back button to close modal
+        window.addEventListener('popstate', (event) => {
+            const overlay = document.getElementById('project-detail-overlay');
+            if (overlay && overlay.style.display === 'flex') {
+                // Modal is open, close it instead of navigating
+                overlay.style.display = 'none';
+                document.body.style.overflow = ''; // Restore scrolling
+                this.modalHistoryState = false;
+            }
+        });
     }
     
     setupScrollAnimations() {
