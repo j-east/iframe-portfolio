@@ -73,6 +73,11 @@ const server = http.createServer((req, res) => {
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         
+        // Prevent caching during development
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
         res.writeHead(200, { 'Content-Type': mimeType });
         res.end(data);
     });

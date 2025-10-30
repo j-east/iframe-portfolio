@@ -34,13 +34,8 @@
             <image rank="standard" description="Side angle view of speaker">downeastaudio_top-view-closeup_standard.webp</image>
             <image rank="featured" description="Purple amplifier PCB showing 20WPC silkscreen detail">downeastaudio_amplifier-pcb-detail_feature.webp</image>
             <image rank="standard" description="Alternate controls detail shot">downeastaudio_control-panel-macro_standard.webp</image>
-            <image rank="standard" description="Red amplifier PCB layout design">downeastaudio_amplifier-pcb-layout_standard.webp</image>
-            <image rank="standard" description="Green PCB layout detail view">downeastaudio_pcb-design-detail_standard.webp</image>
-            <image rank="standard" description="Green PCB layout with component labels">downeastaudio_pcb-back-layout_standard.webp</image>
             <image rank="standard" description="Wooden box with waterproof marine speakers">downeastaudio_waterproof-speaker-lifestyle_standard.webp</image>
             <image rank="standard" description="Waterproof version control panel detail">downeastaudio_branding-closeup_standard.webp</image>
-            <image rank="standard" description="3D model of port connector">downeastaudio_port-connector-3d-model_standard.webp</image>
-            <image rank="standard" description="3D printed port connector">downeastaudio_port-connector-print_standard.webp</image>
         </images>
     </project>
 
@@ -116,13 +111,14 @@
         <skills>Embedded Systems, nRF52 Development, Battery Management, GIS/Mapping, OSM Data Processing, NOAA ENC, Display Drivers, Bluetooth LE, Firmware Optimization</skills>
         <images>
             <image rank="standard" description="PCB with colorful ribbon cable">parachute-altimeter_dev-board-ribbon-cable_standard.webp</image>
-            <image rank="standard" description="Multiple PCBs on workbench during assembly">parachute-altimeter_altimeter-pcb-cable_standard.webp</image>
             <image rank="standard" description="Purple PCB held in hand showing components">parachute-altimeter_stacked-module-side_standard.webp</image>
-            <image rank="hero" description="Micro PCB detail with penny for scale">parachute-altimeter_stacked-pcb-module_hero.webp</image>
-            <image rank="featured" description="PCB with display module and header pins">parachute-altimeter_wrist-display-map_feature.webp</image>
+            <image rank="hero" description="Wrist display showing map interface">parachute-altimeter_wrist-display-map_hero.webp</image>            
             <image rank="standard" description="Florida OSM vector map rendering demonstration">parachute-altimeter_florida-vector-map_standard.webp</image>
             <image rank="standard" description="Detailed Maine coastline map with vector data">parachute-altimeter_maine-coastline-gis_standard.webp</image>
             <image rank="standard" description="Florida map with nautical depth rendering">parachute-altimeter_florida-render-presentation_standard.webp</image>
+            <image rank="standard" description="Altimeter PCB design detail">parachute-altimeter_altimeter-pcb_standard.webp</image>
+            <image rank="standard" description="Altimeter PCB back layout">parachute-altimeter_altimeter-pcb-back_standard.webp</image>
+            <image rank="standard" description="Altimeter PCB red layout design">parachute-altimeter_altimeter-pcb-red_standard.webp</image>
         </images>
     </project>
 
@@ -195,6 +191,10 @@
             <highlight>Custom retrieval and embedding pipeline</highlight>
         </highlights>
         <skills>LLM Integration, RAG Architecture, Vector Databases, Full-Stack Development, Document Processing</skills>
+        <images>
+            <image rank="hero" description="Main chat interface showing multi-party conversation">fabernovus_main-chat_hero.webp</image>
+            <image rank="featured" description="Home page with application overview">fabernovus_home-page_feature.webp</image>
+        </images>
     </project>
 
     <project id="artwork-furniture" featured="true">

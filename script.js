@@ -26,6 +26,21 @@ class PortfolioController {
     setupProjectNavigation() {
         // Set up project card click handlers
         document.addEventListener('click', (e) => {
+            // Check if click was on thumbnail image
+            const thumbnailImage = e.target.closest('.image-thumbnail');
+            if (thumbnailImage) {
+                e.stopPropagation(); // Prevent project card click
+                const projectCard = thumbnailImage.closest('.project-card');
+                if (projectCard) {
+                    const projectId = projectCard.dataset.projectId;
+                    if (projectId && projectId !== 'undefined') {
+                        this.openThumbnailImage(projectId);
+                    }
+                }
+                return;
+            }
+            
+            // Handle regular project card clicks
             const projectCard = e.target.closest('.project-card');
             if (projectCard) {
                 const projectId = projectCard.dataset.projectId;
@@ -34,6 +49,28 @@ class PortfolioController {
                 }
             }
         });
+    }
+    
+    openThumbnailImage(projectId) {
+        // Get project data and open just the hero/thumbnail image in fullscreen
+        if (window.PortfolioXMLParser) {
+            const parser = new window.PortfolioXMLParser();
+            parser.loadPortfolioData('portfolio-template/portfolio-data.xml')
+                .then(() => {
+                    const projectData = parser.getProjectDetails(projectId);
+                    if (projectData && projectData.images && projectData.images.length > 0) {
+                        // Find the best image to show (hero > featured > first available)
+                        const heroImage = projectData.images.find(img => img.rank === 'hero');
+                        const featuredImage = projectData.images.find(img => img.rank === 'featured');
+                        const imageToShow = heroImage || featuredImage || projectData.images[0];
+                        
+                        this.openFullscreenImage(imageToShow.src, imageToShow.description || projectData.title);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading project data for thumbnail:', error);
+                });
+        }
     }
     
     navigateToProject(projectId) {
@@ -127,6 +164,9 @@ class PortfolioController {
             </div>
         `;
         
+        // Show image gallery
+        this.renderProjectGallery(project, overlay);
+        
         // Show highlights
         const highlightsList = overlay.querySelector('.project-detail-highlights');
         if (project.highlights && project.highlights.length > 0) {
@@ -161,6 +201,125 @@ class PortfolioController {
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
     }
     
+    renderProjectGallery(project, overlay) {
+        const galleryContainer = overlay.querySelector('.project-detail-gallery');
+        
+        if (!project.images || project.images.length === 0) {
+            galleryContainer.innerHTML = '<p class="no-images">No images available for this project.</p>';
+            return;
+        }
+        
+        // Sort images by rank priority: hero > featured > standard
+        const rankOrder = { 'hero': 0, 'featured': 1, 'standard': 2 };
+        const sortedImages = [...project.images].sort((a, b) => {
+            const rankA = rankOrder[a.rank] || 3;
+            const rankB = rankOrder[b.rank] || 3;
+            return rankA - rankB;
+        });
+        
+        // Find hero image
+        const heroImage = sortedImages.find(img => img.rank === 'hero');
+        const featuredImages = sortedImages.filter(img => img.rank === 'featured');
+        const standardImages = sortedImages.filter(img => img.rank === 'standard');
+        
+        let galleryHTML = '';
+        
+        // Hero image section (large, prominent display)
+        if (heroImage) {
+            galleryHTML += `
+                <div class="gallery-hero-section">
+                    <div class="gallery-hero-image" onclick="portfolioController.openFullscreenImage('${heroImage.src}', '${heroImage.description}')">
+                        <img src="${heroImage.src}" alt="${heroImage.description}" class="hero-image">
+                        <div class="image-overlay">
+                            <div class="image-rank-badge hero-badge">HERO</div>
+                            <div class="image-description">${heroImage.description}</div>
+                            <div class="fullscreen-hint">Click to view fullscreen</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Featured and standard images grid
+        const otherImages = [...featuredImages, ...standardImages];
+        if (otherImages.length > 0) {
+            galleryHTML += `
+                <div class="gallery-grid-section">
+                    <div class="gallery-grid">
+                        ${otherImages.map(image => `
+                            <div class="gallery-grid-item ${image.rank}" onclick="portfolioController.openFullscreenImage('${image.src}', '${image.description}')">
+                                <img src="${image.src}" alt="${image.description}" class="grid-image">
+                                <div class="image-overlay">
+                                    <div class="image-rank-badge ${image.rank}-badge">${image.rank.toUpperCase()}</div>
+                                    <div class="image-description">${image.description}</div>
+                                    <div class="fullscreen-hint">Click to enlarge</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        galleryContainer.innerHTML = galleryHTML;
+    }
+    
+    openFullscreenImage(imageSrc, description) {
+        console.log('🖼️ Opening fullscreen image:', imageSrc);
+        console.log('🖼️ Description:', description);
+        
+        // Create fullscreen overlay with higher z-index than project modal
+        const fullscreenOverlay = document.createElement('div');
+        fullscreenOverlay.className = 'fullscreen-image-overlay';
+        fullscreenOverlay.style.display = 'flex'; // Ensure it's visible
+        fullscreenOverlay.style.zIndex = '999999'; // Force very high z-index
+        fullscreenOverlay.style.position = 'fixed'; // Ensure it's positioned correctly
+        fullscreenOverlay.innerHTML = `
+            <div class="fullscreen-image-container">
+                <button class="close-fullscreen" onclick="portfolioController.closeFullscreenImage()">×</button>
+                <img src="${imageSrc}" alt="${description}" class="fullscreen-image" onload="console.log('✅ Image loaded successfully')" onerror="console.error('❌ Image failed to load:', this.src)">
+                <div class="fullscreen-description">${description}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(fullscreenOverlay);
+        console.log('🖼️ Fullscreen overlay added to DOM');
+        
+        // Animate in
+        setTimeout(() => {
+            fullscreenOverlay.classList.add('active');
+            console.log('🖼️ Active class added to fullscreen overlay');
+        }, 10);
+        
+        // Close on background click
+        fullscreenOverlay.addEventListener('click', (e) => {
+            if (e.target === fullscreenOverlay) {
+                this.closeFullscreenImage();
+            }
+        });
+        
+        // Close on escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.closeFullscreenImage();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+    }
+    
+    closeFullscreenImage() {
+        const fullscreenOverlay = document.querySelector('.fullscreen-image-overlay');
+        if (fullscreenOverlay) {
+            fullscreenOverlay.classList.remove('active');
+            setTimeout(() => {
+                if (fullscreenOverlay.parentNode) {
+                    fullscreenOverlay.parentNode.removeChild(fullscreenOverlay);
+                }
+            }, 300);
+        }
+    }
+    
     createProjectDetailOverlay() {
         const overlay = document.createElement('div');
         overlay.id = 'project-detail-overlay';
@@ -189,9 +348,21 @@ class PortfolioController {
                         <h3>Links</h3>
                         <div class="project-detail-links"></div>
                     </div>
+                    <div class="project-detail-section project-gallery-section">
+                        <h3>Project Gallery</h3>
+                        <div class="project-detail-gallery"></div>
+                    </div>
                 </div>
             </div>
         `;
+        
+        // Add overlay click-to-close functionality
+        overlay.addEventListener('click', (e) => {
+            // Only close if clicking on the overlay background, not the modal content
+            if (e.target === overlay) {
+                this.closeProjectDetails();
+            }
+        });
         
         document.body.appendChild(overlay);
         return overlay;
@@ -642,7 +813,7 @@ const additionalStyles = `
     border: 1px solid var(--cathode-cyan);
     border-radius: 8px;
     max-width: 800px;
-    max-height: 90vh;
+    max-height: 95vh;
     width: 100%;
     overflow-y: auto;
     box-shadow: 0 8px 32px rgba(77, 217, 217, 0.3);
