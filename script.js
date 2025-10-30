@@ -74,17 +74,8 @@ class PortfolioController {
     }
     
     navigateToProject(projectId) {
-        // Check if we're in an iframe context
-        const isInIframe = window.self !== window.top;
-        
-        if (isInIframe) {
-            // Show project details inline instead of navigating
-            this.showProjectDetails(projectId);
-        } else {
-            // Create project detail page URL for standalone mode
-            const projectUrl = `project.html?id=${projectId}`;
-            window.location.href = projectUrl;
-        }
+        // Always show project details as modal overlay for embeddable component
+        this.showProjectDetails(projectId);
     }
     
     showProjectDetails(projectId) {
