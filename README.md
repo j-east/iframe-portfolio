@@ -16,10 +16,10 @@ An embeddable portfolio component with a warm analog tech aesthetic, featuring c
 ### Basic Embedding
 
 ```html
-<iframe 
-    src="https://yourusername.github.io/iframe-portfolio/" 
-    width="800" 
-    height="600" 
+<iframe
+    src="https://j-east.github.io/iframe-portfolio/"
+    width="800"
+    height="600"
     frameborder="0"
     title="Portfolio">
 </iframe>
@@ -126,7 +126,7 @@ The component uses CSS custom properties for easy theming:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/iframe-portfolio.git
+git clone https://github.com/j-east/iframe-portfolio.git
 cd iframe-portfolio
 ```
 
@@ -164,7 +164,7 @@ iframe-portfolio/
 1. Push your code to the `main` branch
 2. Go to repository Settings → Pages
 3. Select "Deploy from a branch" → `main` → `/ (root)`
-4. Your portfolio will be available at: `https://yourusername.github.io/iframe-portfolio/`
+4. Your portfolio will be available at: `https://j-east.github.io/iframe-portfolio/`
 
 ### Branch Strategy
 
@@ -182,7 +182,7 @@ portfolio.yourdomain.com
 ```
 Type: CNAME
 Name: portfolio
-Value: yourusername.github.io
+Value: j-east.github.io
 ```
 
 ## 🎯 Integration Examples
@@ -192,10 +192,10 @@ Value: yourusername.github.io
 ```html
 <!-- In a WordPress post/page -->
 <div style="text-align: center; margin: 20px 0;">
-    <iframe 
-        src="https://yourusername.github.io/iframe-portfolio/" 
-        width="800" 
-        height="600" 
+    <iframe
+        src="https://j-east.github.io/iframe-portfolio/"
+        width="800"
+        height="600"
         frameborder="0"
         style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
     </iframe>
@@ -211,7 +211,7 @@ const PortfolioEmbed = ({ width = 800, height = 600 }) => {
     return (
         <div className="portfolio-embed">
             <iframe
-                src="https://yourusername.github.io/iframe-portfolio/"
+                src="https://j-east.github.io/iframe-portfolio/"
                 width={width}
                 height={height}
                 frameBorder="0"
@@ -251,9 +251,9 @@ export default {
     props: {
         width: { type: Number, default: 800 },
         height: { type: Number, default: 600 },
-        portfolioUrl: { 
-            type: String, 
-            default: 'https://yourusername.github.io/iframe-portfolio/' 
+        portfolioUrl: {
+            type: String,
+            default: 'https://j-east.github.io/iframe-portfolio/'
         }
     }
 }
@@ -301,9 +301,9 @@ Inspired by vintage analog computing aesthetics, nixie tubes, oscilloscopes, and
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/iframe-portfolio/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/iframe-portfolio/discussions)
-- **Email**: your@email.com
+- **Issues**: [GitHub Issues](https://github.com/j-east/iframe-portfolio/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/j-east/iframe-portfolio/discussions)
+
 
 ---
 

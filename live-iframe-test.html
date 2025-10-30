@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Portfolio Iframe Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .iframe-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .iframe-container h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        
+        iframe {
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-block {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Live Portfolio Component - GitHub Pages Deployment Test</h1>
+        
+        <div class="success">
+            <strong>✅ Deployment Successful!</strong> The portfolio component is now live and ready to be embedded on any website.
+        </div>
+        
+        <div class="iframe-container">
+            <h2>Live Embedded Portfolio (800x600)</h2>
+            <p class="description">
+                This is the live portfolio component embedded directly from GitHub Pages. 
+                It's now ready to be used on any website with this exact code.
+            </p>
+            <iframe src="https://j-east.github.io/iframe-portfolio/" width="800" height="600"></iframe>
+            
+            <div class="code-block">
+&lt;iframe src="https://j-east.github.io/iframe-portfolio/" 
+        width="800" 
+        height="600" 
+        frameborder="0"
+        title="Interactive Portfolio"&gt;
+&lt;/iframe&gt;
+            </div>
+        </div>
+        
+        <div class="iframe-container">
+            <h2>Responsive Embedding Example</h2>
+            <p class="description">
+                For responsive websites, you can use CSS to make the iframe responsive:
+            </p>
+            
+            <div style="position: relative; width: 100%; height: 0; padding-bottom: 75%; overflow: hidden;">
+                <iframe 
+                    src="https://j-east.github.io/iframe-portfolio/" 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+                    title="Responsive Portfolio">
+                </iframe>
+            </div>
+            
+            <div class="code-block">
+&lt;div style="position: relative; width: 100%; height: 0; padding-bottom: 75%; overflow: hidden;"&gt;
+    &lt;iframe 
+        src="https://j-east.github.io/iframe-portfolio/" 
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+        title="Responsive Portfolio"&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+            </div>
+        </div>
+        
+        <div class="iframe-container">
+            <h2>🚀 Ready for Production</h2>
+            <p class="description">
+                The portfolio component is now successfully deployed and can be embedded anywhere:
+            </p>
+            <ul>
+                <li><strong>Live URL:</strong> <a href="https://j-east.github.io/iframe-portfolio/" target="_blank">https://j-east.github.io/iframe-portfolio/</a></li>
+                <li><strong>Responsive Design:</strong> Adapts to any iframe size</li>
+                <li><strong>Cross-Origin Safe:</strong> Works on any domain</li>
+                <li><strong>Fast Loading:</strong> Optimized for performance</li>
+                <li><strong>Interactive:</strong> Full functionality preserved</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
