@@ -3,7 +3,7 @@
 # Site settings
 title: "Iframe Portfolio Component"
 description: "Embeddable portfolio component with warm analog tech aesthetic"
-url: "https://yourusername.github.io"
+url: "https://j-east.github.io"
 baseurl: "/iframe-portfolio"
 
 # Build settings
@@ -29,12 +29,12 @@ plugins:
 
 # SEO and meta tags
 lang: en
-author: "Your Name"
+author: "John Evans"
 
 # GitHub Pages specific settings
 github:
   repository_name: iframe-portfolio
-  repository_url: https://github.com/yourusername/iframe-portfolio
+  repository_url: https://github.com/j-east/iframe-portfolio
 
 # Custom variables for the portfolio
 portfolio:
