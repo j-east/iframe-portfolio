@@ -6,11 +6,14 @@ class PortfolioController {
         this.animationFrame = null;
         this.waveOffset = 0;
         this.projects = [];
+        this.circuitBackground = null;
+        this.typewriterHasRun = false; // Flag to track if typewriter effect has run
         
         this.init();
     }
     
     init() {
+        this.setupCircuitBackground();
         this.setupProjectNavigation();
         this.setupSkillBars();
         this.setupOscilloscope();
@@ -19,9 +22,17 @@ class PortfolioController {
         this.setupScrollAnimations();
         this.setupBackButtonHandling();
         
-        // Initialize animations
-        this.triggerSectionAnimation('intro');
+        // Initialize animations - typewriter effect will be triggered after content loads
+        // this.typewriterEffect();
+        // this.typewriterHasRun = true;
         
+    }
+    
+    setupCircuitBackground() {
+        // Initialize the animated circuit background
+        if (window.CircuitBackground) {
+            this.circuitBackground = new CircuitBackground('circuit-canvas');
+        }
     }
     
     setupProjectNavigation() {
@@ -535,24 +546,65 @@ class PortfolioController {
     }
     
     setupAmbientEffects() {
-        // Create additional floating particles dynamically
+        // Create additional floating particles dynamically with circuit theme
         const ambientContainer = document.querySelector('.ambient-effects');
         
         const createParticle = () => {
             const particle = document.createElement('div');
             particle.className = 'floating-particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.setProperty('--delay', Math.random() * 5 + 's');
-            particle.style.setProperty('--duration', (8 + Math.random() * 8) + 's');
             
-            // Random color variation
-            const colors = ['var(--cathode-cyan)', 'var(--amber-glow)', 'var(--phosphor-green)'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            particle.style.background = randomColor;
+            // Random starting position
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.setProperty('--delay', Math.random() * 3 + 's');
+            particle.style.setProperty('--duration', (6 + Math.random() * 6) + 's');
+            
+            // Circuit-themed particle types
+            const particleTypes = [
+                {
+                    color: 'var(--terminal-green)',
+                    filter: 'var(--glow-terminal)',
+                    size: '3px',
+                    animation: 'circuit-float-1 10s linear infinite, particle-pulse-1 3s ease-in-out infinite'
+                },
+                {
+                    color: 'var(--cathode-cyan)',
+                    filter: 'var(--glow-cyan)',
+                    size: '4px',
+                    animation: 'circuit-float-2 14s linear infinite, particle-pulse-2 4s ease-in-out infinite'
+                },
+                {
+                    color: 'var(--phosphor-green)',
+                    filter: 'var(--glow-phosphor)',
+                    size: '2px',
+                    animation: 'circuit-float-3 8s linear infinite, particle-pulse-3 2s ease-in-out infinite'
+                },
+                {
+                    color: 'var(--amber-glow)',
+                    filter: 'var(--glow-amber)',
+                    size: '2.5px',
+                    animation: 'circuit-float-1 12s linear infinite, particle-pulse-1 4s ease-in-out infinite'
+                },
+                {
+                    color: 'var(--mint-glow)',
+                    filter: 'var(--glow-phosphor)',
+                    size: '1.5px',
+                    animation: 'circuit-float-3 6s linear infinite, particle-pulse-3 1.5s ease-in-out infinite'
+                }
+            ];
+            
+            const randomType = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+            particle.style.background = randomType.color;
+            particle.style.filter = randomType.filter;
+            particle.style.width = randomType.size;
+            particle.style.height = randomType.size;
+            particle.style.animation = randomType.animation;
+            
+            // Add slight random delay to animation
+            particle.style.animationDelay = (Math.random() * 2) + 's';
             
             ambientContainer.appendChild(particle);
             
-            // Remove particle after animation
+            // Remove particle after animation completes
             setTimeout(() => {
                 if (particle.parentNode) {
                     particle.parentNode.removeChild(particle);
@@ -560,19 +612,41 @@ class PortfolioController {
             }, 16000);
         };
         
-        // Create particles periodically
-        setInterval(createParticle, 3000);
+        // Create circuit trace lighting effects
+        const createTraceEffect = () => {
+            const traces = document.querySelectorAll('.circuit-trace');
+            traces.forEach((trace, index) => {
+                setTimeout(() => {
+                    trace.style.animationDelay = (Math.random() * 2) + 's';
+                }, index * 100);
+            });
+        };
         
-        // Initial particles
-        for (let i = 0; i < 3; i++) {
-            setTimeout(createParticle, i * 1000);
+        // Create particles more frequently for richer effect
+        setInterval(createParticle, 2000);
+        
+        // Randomize trace animations periodically
+        setInterval(createTraceEffect, 8000);
+        
+        // Initial particles with staggered timing
+        for (let i = 0; i < 5; i++) {
+            setTimeout(createParticle, i * 800);
         }
+        
+        // Initial trace effect
+        setTimeout(createTraceEffect, 1000);
     }
     
     triggerSectionAnimation(sectionId) {
         switch (sectionId) {
             case 'intro':
-                this.typewriterEffect();
+                // Only run typewriter effect once per page load
+                // The effect is triggered by XML parser after content loads
+                if (!this.typewriterHasRun) {
+                    // Don't run here, let XML parser handle it
+                    // this.typewriterEffect();
+                    // this.typewriterHasRun = true;
+                }
                 break;
             case 'projects':
                 this.animateProjectCards();
@@ -610,6 +684,11 @@ class PortfolioController {
                 }, 30);
             }, index * 1000);
         });
+    }
+    
+    // Method to reset typewriter effect if needed (for dynamic content updates)
+    resetTypewriterEffect() {
+        this.typewriterHasRun = false;
     }
     
     animateProjectCards() {

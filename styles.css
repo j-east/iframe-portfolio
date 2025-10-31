@@ -74,43 +74,23 @@ body {
 .portfolio-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: 300vh; /* Increased height for scrolling and parallax effect */
   padding: 20px;
   background: linear-gradient(135deg, var(--black) 0%, var(--gray-dark) 100%);
 }
 
-/* Circuit Board Background */
-.circuit-bg {
-  position: absolute;
+/* Animated Circuit Board Background */
+.circuit-canvas {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
-  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.circuit-trace {
-  stroke: var(--cathode-cyan);
-  filter: var(--glow-cyan);
-  animation: pulse-trace 3s ease-in-out infinite alternate;
-}
-
-.circuit-node {
-  fill: var(--amber-glow);
-  filter: var(--glow-amber);
-  animation: node-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-trace {
-  0% { opacity: 0.3; }
-  100% { opacity: 0.8; }
-}
-
-@keyframes node-glow {
-  0% { opacity: 0.5; }
-  100% { opacity: 1; }
-}
+/* Canvas-based circuit background - no additional CSS needed */
 
 /* Content Wrapper */
 .content-wrapper {
@@ -120,13 +100,13 @@ body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  min-height: calc(100vh - 40px);
+  gap: 60px; /* Increased gap for better spacing */
+  min-height: calc(300vh - 40px); /* Match container height */
 }
 
 /* Header Section */
 .portfolio-header {
-  background: var(--black-pure);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 8px;
   padding: 30px;
   box-shadow:
@@ -217,7 +197,7 @@ body {
   align-items: center;
   margin-bottom: 30px;
   padding: 20px;
-  background: var(--black);
+  background: rgba(26, 26, 26, 0.5);
   border-radius: 8px;
   border: 1px solid var(--brass);
 }
@@ -261,7 +241,7 @@ body {
 
 /* Content Sections */
 .content-section {
-  background: var(--black-pure);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 8px;
   padding: 30px;
   box-shadow:
@@ -279,7 +259,7 @@ body {
 
 /* Intro Panel */
 .intro-panel {
-  background: var(--black);
+  background: rgba(26, 26, 26, 0.5);
   border-radius: 8px;
   border: 1px solid var(--copper);
   padding: 30px;
@@ -345,7 +325,7 @@ body {
 }
 
 .project-card {
-  background: var(--black);
+  background: rgba(26, 26, 26, 0.5);
   border: 1px solid var(--copper);
   border-radius: 8px;
   padding: 20px;
@@ -518,7 +498,7 @@ body {
 }
 
 .skill-category {
-  background: var(--black);
+  background: rgba(26, 26, 26, 0.5);
   border: 1px solid var(--copper);
   border-radius: 8px;
   padding: 20px;
@@ -558,7 +538,7 @@ body {
 }
 
 .skill-bar {
-  background: var(--black-pure);
+  background: rgba(0, 0, 0, 0.5);
   height: 8px;
   border-radius: 4px;
   overflow: hidden;
@@ -596,7 +576,7 @@ body {
 }
 
 .contact-display {
-  background: var(--black);
+  background: rgba(26, 26, 26, 0.5);
   border: 1px solid var(--copper);
   border-radius: 8px;
   padding: 20px;
@@ -664,7 +644,7 @@ a.contact-link:hover {
 
 /* Oscilloscope */
 .oscilloscope {
-  background: var(--black);
+  background: rgba(26, 26, 26, 0.5);
   border: 1px solid var(--copper);
   border-radius: 8px;
   padding: 15px;
@@ -676,11 +656,11 @@ a.contact-link:hover {
 #oscilloscope-canvas {
   border: 1px solid var(--phosphor-green);
   border-radius: 4px;
-  background: var(--black-pure);
+  background: rgba(0, 0, 0, 0.5);
   filter: var(--glow-phosphor);
 }
 
-/* Ambient Effects */
+/* Enhanced Ambient Effects */
 .ambient-effects {
   position: fixed;
   top: 0;
@@ -689,19 +669,170 @@ a.contact-link:hover {
   height: 100%;
   pointer-events: none;
   z-index: 0;
+  overflow: hidden;
 }
 
 .floating-particle {
   position: absolute;
+  border-radius: 50%;
+  animation: circuit-float var(--duration, 12s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+/* Different particle types with circuit-themed colors */
+.floating-particle:nth-child(1) {
+  width: 3px;
+  height: 3px;
+  background: var(--terminal-green);
+  filter: var(--glow-terminal);
+  animation: circuit-float-1 10s linear infinite, particle-pulse-1 3s ease-in-out infinite;
+}
+
+.floating-particle:nth-child(2) {
   width: 4px;
   height: 4px;
   background: var(--cathode-cyan);
-  border-radius: 50%;
   filter: var(--glow-cyan);
-  animation: float var(--duration, 10s) linear infinite;
-  animation-delay: var(--delay, 0s);
+  animation: circuit-float-2 14s linear infinite, particle-pulse-2 4s ease-in-out infinite;
 }
 
+.floating-particle:nth-child(3) {
+  width: 2px;
+  height: 2px;
+  background: var(--phosphor-green);
+  filter: var(--glow-phosphor);
+  animation: circuit-float-3 8s linear infinite, particle-pulse-3 2s ease-in-out infinite;
+}
+
+/* Circuit-themed particle animations */
+@keyframes circuit-float-1 {
+  0% {
+    transform: translateX(-10px) translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  20% {
+    transform: translateX(20px) translateY(80vh) rotate(45deg);
+  }
+  40% {
+    transform: translateX(-15px) translateY(60vh) rotate(90deg);
+  }
+  60% {
+    transform: translateX(25px) translateY(40vh) rotate(135deg);
+  }
+  80% {
+    transform: translateX(-20px) translateY(20vh) rotate(180deg);
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(10px) translateY(-10px) rotate(225deg);
+    opacity: 0;
+  }
+}
+
+@keyframes circuit-float-2 {
+  0% {
+    transform: translateX(100vw) translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.7;
+  }
+  25% {
+    transform: translateX(80vw) translateY(75vh) rotate(-30deg);
+  }
+  50% {
+    transform: translateX(60vw) translateY(50vh) rotate(-60deg);
+  }
+  75% {
+    transform: translateX(40vw) translateY(25vh) rotate(-90deg);
+  }
+  92% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(20vw) translateY(-10px) rotate(-120deg);
+    opacity: 0;
+  }
+}
+
+@keyframes circuit-float-3 {
+  0% {
+    transform: translateX(50vw) translateY(100vh) rotate(0deg) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+    transform: translateX(45vw) translateY(85vh) rotate(60deg) scale(1);
+  }
+  30% {
+    transform: translateX(55vw) translateY(70vh) rotate(120deg) scale(0.8);
+  }
+  45% {
+    transform: translateX(40vw) translateY(55vh) rotate(180deg) scale(1.2);
+  }
+  60% {
+    transform: translateX(60vw) translateY(40vh) rotate(240deg) scale(0.7);
+  }
+  75% {
+    transform: translateX(35vw) translateY(25vh) rotate(300deg) scale(1);
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(50vw) translateY(-10px) rotate(360deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-pulse-1 {
+  0%, 100% {
+    filter: var(--glow-terminal);
+    transform: scale(1);
+  }
+  50% {
+    filter: var(--glow-terminal) brightness(1.5);
+    transform: scale(1.3);
+  }
+}
+
+@keyframes particle-pulse-2 {
+  0%, 100% {
+    filter: var(--glow-cyan);
+    transform: scale(1);
+  }
+  33% {
+    filter: var(--glow-cyan) brightness(1.3);
+    transform: scale(1.1);
+  }
+  66% {
+    filter: var(--glow-cyan) brightness(0.8);
+    transform: scale(0.9);
+  }
+}
+
+@keyframes particle-pulse-3 {
+  0%, 100% {
+    filter: var(--glow-phosphor);
+    transform: scale(1);
+  }
+  25% {
+    filter: var(--glow-phosphor) brightness(1.4);
+    transform: scale(1.2);
+  }
+  75% {
+    filter: var(--glow-phosphor) brightness(0.7);
+    transform: scale(0.8);
+  }
+}
+
+/* Legacy float animation for compatibility */
 @keyframes float {
   0% {
     transform: translateY(100vh) translateX(0);
@@ -757,6 +888,34 @@ a.contact-link:hover {
   
   .projects-grid {
     gap: 15px;
+  }
+  
+  .project-content {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .image-thumbnail {
+    width: 100%;
+    height: 200px;
+    align-self: center;
+    max-width: 300px;
+  }
+  
+  .project-info {
+    min-width: auto;
+  }
+  
+  .project-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .project-title {
+    font-size: 1.1rem;
   }
   
   .skills-matrix {

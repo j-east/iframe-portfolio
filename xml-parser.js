@@ -371,6 +371,14 @@ if (typeof window !== 'undefined') {
                 <p>${meta.tagline}</p>
                 <p class="highlight">${meta.description || 'Passionate about creating innovative solutions and bringing ideas to life through engineering and code.'}</p>
             `;
+            
+            // Trigger typewriter effect after content is populated
+            if (window.portfolioController && !window.portfolioController.typewriterHasRun) {
+                setTimeout(() => {
+                    window.portfolioController.typewriterEffect();
+                    window.portfolioController.typewriterHasRun = true;
+                }, 100); // Small delay to ensure DOM is updated
+            }
         }
     }
     
