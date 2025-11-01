@@ -2,7 +2,7 @@
 
 An embeddable portfolio component with a warm analog tech aesthetic, featuring circuit board traces, glowing effects, and interactive animations. Designed to be hosted on GitHub Pages and embedded as an iframe on any website.
 
-## 📄 XML-Based Content Management
+## XML-Based Content Management
 
 This portfolio uses a structured XML data format for easy content management and LLM-assisted editing:
 
@@ -42,7 +42,7 @@ The XML structure makes it simple to update portfolio content using LLMs:
 
 Simply provide your images and let AI generate the descriptions and organize the content structure!
 
-## 🎨 Design Features
+## Design Features
 
 - **Warm Analog Tech Aesthetic**: Amber glows, cathode cyan highlights, and phosphor green accents
 - **Circuit Board Background**: Subtle animated circuit traces and nodes
@@ -51,7 +51,7 @@ Simply provide your images and let AI generate the descriptions and organize the
 - **Responsive Design**: Adapts seamlessly from desktop to mobile layouts
 - **Floating Particles**: Ambient background effects for enhanced atmosphere
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Basic Embedding
 
@@ -74,13 +74,13 @@ Simply provide your images and let AI generate the descriptions and organize the
 | **Mobile** | 400px | 500px | Mobile-optimized |
 | **Sidebar** | 350px | 600px | Narrow sidebar widget |
 
-## 📱 Responsive Breakpoints
+## Responsive Breakpoints
 
 - **Desktop (>768px)**: Side-by-side navigation and content layout
 - **Mobile (≤768px)**: Stacked layout with horizontal navigation buttons
 - **Small Mobile (≤480px)**: Optimized spacing and typography
 
-## 🎛️ Customization
+## Customization
 
 ### XML-Based Content Management
 
@@ -145,7 +145,7 @@ The component uses CSS custom properties for easy theming:
 }
 ```
 
-## 🛠️ Development Setup
+## Development Setup
 
 ### Local Development
 
@@ -191,7 +191,7 @@ iframe-portfolio/
 └── .gitignore                    # Git ignore rules
 ```
 
-## 🌐 GitHub Pages Deployment
+## GitHub Pages Deployment
 
 ### Automatic Deployment
 
@@ -219,7 +219,7 @@ Name: portfolio
 Value: j-east.github.io
 ```
 
-## 🎯 Integration Examples
+## Integration Examples
 
 ### WordPress
 
@@ -302,7 +302,7 @@ export default {
 </style>
 ```
 
-## 🔧 Browser Compatibility
+## Browser Compatibility
 
 - **Chrome**: Full support ✅
 - **Firefox**: Full support ✅
@@ -310,7 +310,7 @@ export default {
 - **Edge**: Full support ✅
 - **Mobile Browsers**: Responsive support ✅
 
-## 📊 Performance
+## Performance
 
 The portfolio is designed as a static component that loads efficiently:
 
@@ -319,7 +319,7 @@ The portfolio is designed as a static component that loads efficiently:
 - **Minimal Dependencies**: Pure HTML, CSS, and JavaScript
 - **Smooth Animations**: Hardware-accelerated CSS animations
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
@@ -327,15 +327,15 @@ The portfolio is designed as a static component that loads efficiently:
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the GPL-2.0 License - see the [LICENSE](LICENSE) file for details.
 
-## 🎨 Design Credits
+## Design Credits
 
 Inspired by vintage analog computing aesthetics, nixie tubes, oscilloscopes, and retro terminal interfaces. Color palette designed for warm, nostalgic tech vibes while maintaining modern accessibility standards.
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/j-east/iframe-portfolio/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/j-east/iframe-portfolio/discussions)
