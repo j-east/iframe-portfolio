@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -24,6 +24,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Update Version
+        run: |
+          echo "🚀 Updating version to date-based format..."
+          node update-version.js
+          
+      - name: Commit version changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json portfolio-template/portfolio-data.xml README.md
+          git diff --staged --quiet || git commit -m "🔖 Auto-update version to $(date +'%y.%m.%d.0')"
+          git push
         
       - name: Setup Pages
         uses: actions/configure-pages@v4

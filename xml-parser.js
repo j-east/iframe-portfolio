@@ -35,6 +35,7 @@ class PortfolioXMLParser {
         }
         
         const data = {
+            version: portfolio.getAttribute('version') || '1.0.0',
             meta: this.parseMeta(portfolio.querySelector('meta')),
             skills: this.parseSkills(portfolio.querySelector('skills')),
             projects: this.parseProjects(portfolio.querySelectorAll('project')),
@@ -367,7 +368,7 @@ if (typeof window !== 'undefined') {
         const statusElement = document.querySelector('.status-text');
         if (titleElement && data.meta) {
             titleElement.textContent = data.meta.name.toUpperCase();
-            statusElement.textContent = 'Interactive Portfolio v1.0';
+            statusElement.textContent = `Interactive Portfolio v${data.version}`;
         }
         
         // Populate about section

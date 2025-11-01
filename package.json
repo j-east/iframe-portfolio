@@ -1,6 +1,6 @@
 {
   "name": "iframe-portfolio",
-  "version": "1.0.0",
+  "version": "25.11.01.0",
   "description": "Embeddable portfolio component with warm analog tech aesthetic",
   "main": "index.html",
   "scripts": {
@@ -8,7 +8,9 @@
     "dev": "node server.js",
     "test": "echo \"Open http://localhost:8000/iframe-test.html to test the component\" && exit 0",
     "build": "echo \"No build process needed - static files\" && exit 0",
-    "deploy": "echo \"Push to main branch for GitHub Pages deployment\" && exit 0"
+    "deploy": "echo \"Push to main branch for GitHub Pages deployment\" && exit 0",
+    "version:update": "node update-version.js",
+    "version:show": "echo \"Current version: $(node -p 'require(\"./package.json\").version')\""
   },
   "repository": {
     "type": "git",

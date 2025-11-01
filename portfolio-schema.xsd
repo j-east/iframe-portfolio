@@ -12,6 +12,7 @@
                     <xs:element name="interlude" type="InterludeType"/>
                 </xs:choice>
             </xs:sequence>
+            <xs:attribute name="version" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     
