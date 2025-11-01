@@ -287,6 +287,11 @@ class PortfolioXMLParser {
     
     // Method to get the best thumbnail image for a project
     getProjectThumbnail(project) {
+        // On mobile devices, use full-size images to avoid pixelation
+        if (window.innerWidth <= 768) {
+            return this.getProjectFullsizeImage(project);
+        }
+        
         if (!project.images || project.images.length === 0) return null;
         
         // Priority order: hero > featured > standard
@@ -298,6 +303,21 @@ class PortfolioXMLParser {
         
         // Fallback to first image
         return project.images[0].thumbnail;
+    }
+    
+    // Method to get the best full-size image for a project (for mobile)
+    getProjectFullsizeImage(project) {
+        if (!project.images || project.images.length === 0) return null;
+        
+        // Prefer hero image first
+        const heroImage = project.images.find(img => img.rank === 'hero');
+        if (heroImage) return heroImage.src;
+
+        const featuredImage = project.images.find(img => img.rank === 'featured');
+        if (featuredImage) return featuredImage.src;
+
+        // Fallback to first image
+        return project.images[0].src;
     }
     
     // Method to get all projects (including non-featured)

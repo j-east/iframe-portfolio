@@ -99,7 +99,7 @@
         <category>software,computer-vision,open-source</category>
         <links>
             <link type="github" label="GitHub Repository">https://github.com/j-east/JevonsCameraViewer</link>
-            <link type="hackaday" label="Hackaday Feature">https://hackaday.io/project/jevons-camera</link>
+            <link type="hackaday" label="Hackaday Feature">https://hackaday.com/2018/05/05/low-cost-eye-tracking-with-webcams-and-open-source-software/</link>
         </links>
         <description>
             Open-source machine vision research tool designed for sharing research rather than as a product. Featured on Hackaday.

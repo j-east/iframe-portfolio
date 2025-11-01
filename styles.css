@@ -903,6 +903,11 @@ a.contact-link:hover {
     max-width: 300px;
   }
   
+  /* Use full-size images on mobile to avoid pixelation */
+  .project-thumbnail {
+    content: url(attr(data-fullsize));
+  }
+  
   .project-info {
     min-width: auto;
   }
