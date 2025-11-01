@@ -359,13 +359,15 @@ body {
   transition: all 0.3s ease;
 }
 
-.project-card:hover .image-thumbnail {
-  border-color: var(--cathode-cyan);
-  box-shadow: 0 0 8px rgba(77, 217, 217, 0.3);
+.project-card:hover .image-thumbnail,
+.project-card.mobile-hover .image-thumbnail {
+    border-color: var(--cathode-cyan);
+    box-shadow: 0 0 8px rgba(77, 217, 217, 0.3);
 }
 
-.project-card:hover .project-thumbnail {
-  filter: brightness(1.0) contrast(1.2);
+.project-card:hover .project-thumbnail,
+.project-card.mobile-hover .project-thumbnail {
+    filter: brightness(1.0) contrast(1.2);
 }
 
 .project-info {
@@ -388,14 +390,16 @@ body {
   transition: transform 0.3s ease;
 }
 
-.project-card:hover::before {
-  transform: scaleX(1);
+.project-card:hover::before,
+.project-card.mobile-hover::before {
+    transform: scaleX(1);
 }
 
-.project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  border-color: var(--cathode-cyan);
+.project-card:hover,
+.project-card.mobile-hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: var(--cathode-cyan);
 }
 
 .project-header {
@@ -484,7 +488,8 @@ body {
     cursor: pointer;
 }
 
-.project-card:hover {
+.project-card:hover,
+.project-card.mobile-hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     border-color: var(--cathode-cyan);
@@ -1268,8 +1273,9 @@ a.contact-link:hover {
   transition: transform 0.3s ease;
 }
 
-.project-card:hover .project-thumbnail {
-  transform: scale(1.05);
+.project-card:hover .project-thumbnail,
+.project-card.mobile-hover .project-thumbnail {
+    transform: scale(1.05);
 }
 
 /* Loading state for modal */

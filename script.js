@@ -36,8 +36,16 @@ class PortfolioController {
     }
     
     setupProjectNavigation() {
+        let touchHandled = false;
+
         // Set up project card click handlers
         document.addEventListener('click', (e) => {
+            // Skip click handling if touch was already handled
+            if (touchHandled) {
+                touchHandled = false;
+                return;
+            }
+
             // Check if click was on thumbnail image
             const thumbnailImage = e.target.closest('.image-thumbnail');
             if (thumbnailImage) {
@@ -60,6 +68,40 @@ class PortfolioController {
                     this.navigateToProject(projectId);
                 }
             }
+        });
+
+        // Set up mobile touch handlers for project cards to ensure hover animation plays
+        document.addEventListener('touchstart', (e) => {
+            const projectCard = e.target.closest('.project-card');
+            if (projectCard) {
+                // Add hover class to trigger animation
+                projectCard.classList.add('mobile-hover');
+                touchHandled = true;
+            }
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const projectCard = e.target.closest('.project-card');
+            if (projectCard && touchHandled) {
+                e.preventDefault(); // Prevent click event from firing
+                const projectId = projectCard.dataset.projectId;
+                if (projectId && projectId !== 'undefined') {
+                    // Keep hover animation for a moment, then open modal
+                    setTimeout(() => {
+                        this.navigateToProject(projectId);
+                        // Keep hover class active until modal is closed
+                    }, 250); // Delay to let animation play fully
+                }
+            }
+        });
+
+        // Clean up hover states when touch is cancelled
+        document.addEventListener('touchcancel', (e) => {
+            const projectCards = document.querySelectorAll('.project-card.mobile-hover');
+            projectCards.forEach(card => {
+                card.classList.remove('mobile-hover');
+            });
+            touchHandled = false;
         });
     }
     
@@ -377,6 +419,12 @@ class PortfolioController {
             overlay.style.display = 'none';
             document.body.style.overflow = ''; // Restore scrolling
             
+            // Remove mobile-hover class from all project cards to reverse animation
+            const projectCards = document.querySelectorAll('.project-card.mobile-hover');
+            projectCards.forEach(card => {
+                card.classList.remove('mobile-hover');
+            });
+            
             // Remove the history state if it was added
             if (this.modalHistoryState) {
                 history.back();
@@ -393,6 +441,13 @@ class PortfolioController {
                 // Modal is open, close it instead of navigating
                 overlay.style.display = 'none';
                 document.body.style.overflow = ''; // Restore scrolling
+                
+                // Remove mobile-hover class from all project cards to reverse animation
+                const projectCards = document.querySelectorAll('.project-card.mobile-hover');
+                projectCards.forEach(card => {
+                    card.classList.remove('mobile-hover');
+                });
+                
                 this.modalHistoryState = false;
             }
         });
