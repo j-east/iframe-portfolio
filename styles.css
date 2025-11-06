@@ -27,6 +27,22 @@
     text-shadow: 0 0 5px #00ff00;
 }
 
+/* Mobile adjustments for workflow link */
+@media (max-width: 768px) {
+    .workflow-link {
+        position: static;
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .configure-link {
+        display: inline-block;
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+}
+
 /* Analog Tech Portfolio - CSS Variables */
 :root {
   /* Primary Warm Tones - Authentic Amber */
