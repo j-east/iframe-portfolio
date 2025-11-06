@@ -1,6 +1,6 @@
 {
   "name": "iframe-portfolio",
-  "version": "25.11.01.0",
+  "version": "25.11.06.0",
   "description": "Embeddable portfolio component with warm analog tech aesthetic",
   "main": "index.html",
   "scripts": {
