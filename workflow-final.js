@@ -75,7 +75,6 @@ class ServerlessWorkflowManager {
         // Button event listeners
         document.getElementById('convertImagesBtn').addEventListener('click', this.convertImages.bind(this));
         document.getElementById('downloadImagesBtn').addEventListener('click', this.downloadAllImages.bind(this));
-        document.getElementById('saveApiKeyBtn').addEventListener('click', this.saveApiKey.bind(this));
         document.getElementById('testApiKeyBtn').addEventListener('click', this.testApiKey.bind(this));
         document.getElementById('classifyImagesBtn').addEventListener('click', this.classifyImages.bind(this));
         document.getElementById('manualClassifyBtn').addEventListener('click', this.startManualClassification.bind(this));
@@ -94,6 +93,12 @@ class ServerlessWorkflowManager {
     async proceedToStep2() {
         const nextBtn = document.getElementById('nextToStep2Btn');
         const originalText = nextBtn.textContent;
+        const apiKeyInput = document.getElementById('openrouterApiKey').value.trim();
+        
+        if (!apiKeyInput) {
+            this.showStatus('apiStatus', 'Please enter an API key', 'error');
+            return;
+        }
         
         nextBtn.disabled = true;
         nextBtn.textContent = 'Testing API Key...';
@@ -104,7 +109,7 @@ class ServerlessWorkflowManager {
             const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.openrouterApiKey}`,
+                    'Authorization': `Bearer ${apiKeyInput}`,
                     'Content-Type': 'application/json',
                     'HTTP-Referer': window.location.origin,
                     'X-Title': 'Portfolio Workflow Manager'
@@ -117,16 +122,19 @@ class ServerlessWorkflowManager {
             });
 
             if (response.ok) {
-                this.showStatus('apiStatus', 'API key verified! ✓ Proceeding to XML builder...', 'success');
+                // Test passed - save the key
+                localStorage.setItem('openrouterApiKey', apiKeyInput);
+                this.openrouterApiKey = apiKeyInput;
+                this.showStatus('apiStatus', 'API key verified and saved! ✓ Proceeding to XML builder...', 'success');
                 setTimeout(() => this.goToStep(WorkflowStep.BUILD_XML), 500);
             } else {
                 const error = await response.json();
-                this.showStatus('apiStatus', `API test failed: ${error.error?.message || 'Unknown error'}. Please check your key.`, 'error');
+                this.showStatus('apiStatus', `API test failed: ${error.error?.message || 'Unknown error'}. Key not saved.`, 'error');
                 nextBtn.disabled = false;
                 nextBtn.textContent = originalText;
             }
         } catch (error) {
-            this.showStatus('apiStatus', `API test failed: ${error.message}. Please check your key.`, 'error');
+            this.showStatus('apiStatus', `API test failed: ${error.message}. Key not saved.`, 'error');
             nextBtn.disabled = false;
             nextBtn.textContent = originalText;
         }
@@ -465,20 +473,6 @@ class ServerlessWorkflowManager {
         document.getElementById('nextToStep2Btn').disabled = !apiKey;
     }
 
-    saveApiKey() {
-        const apiKey = document.getElementById('openrouterApiKey').value.trim();
-        if (!apiKey) {
-            this.showStatus('apiStatus', 'Please enter an API key', 'error');
-            return;
-        }
-
-        localStorage.setItem('openrouterApiKey', apiKey);
-        this.openrouterApiKey = apiKey;
-        document.getElementById('testApiKeyBtn').disabled = false;
-        this.showStatus('apiStatus', 'API key saved successfully', 'success');
-        this.updateButtons();
-    }
-
     async sendChatMessage() {
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
@@ -583,6 +577,13 @@ Current XML: ${this.xmlData ? 'exists' : 'none yet'}`;
 
     async testApiKey() {
         const testBtn = document.getElementById('testApiKeyBtn');
+        const apiKeyInput = document.getElementById('openrouterApiKey').value.trim();
+        
+        if (!apiKeyInput) {
+            this.showStatus('apiStatus', 'Please enter an API key', 'error');
+            return;
+        }
+        
         testBtn.disabled = true;
         testBtn.textContent = 'Testing...';
 
@@ -592,7 +593,7 @@ Current XML: ${this.xmlData ? 'exists' : 'none yet'}`;
             const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.openrouterApiKey}`,
+                    'Authorization': `Bearer ${apiKeyInput}`,
                     'Content-Type': 'application/json',
                     'HTTP-Referer': window.location.origin,
                     'X-Title': 'Portfolio Workflow Manager'
@@ -605,14 +606,17 @@ Current XML: ${this.xmlData ? 'exists' : 'none yet'}`;
             });
 
             if (response.ok) {
-                this.showStatus('apiStatus', 'API key is valid and working with OpenRouter! ✓', 'success');
+                // Test passed - save the key
+                localStorage.setItem('openrouterApiKey', apiKeyInput);
+                this.openrouterApiKey = apiKeyInput;
+                this.showStatus('apiStatus', 'API key is valid and saved! ✓', 'success');
                 this.updateButtons();
             } else {
                 const error = await response.json();
-                this.showStatus('apiStatus', `API test failed: ${error.error?.message || 'Unknown error'}`, 'error');
+                this.showStatus('apiStatus', `API test failed: ${error.error?.message || 'Unknown error'}. Key not saved.`, 'error');
             }
         } catch (error) {
-            this.showStatus('apiStatus', `API test failed: ${error.message}`, 'error');
+            this.showStatus('apiStatus', `API test failed: ${error.message}. Key not saved.`, 'error');
         } finally {
             testBtn.disabled = false;
             testBtn.textContent = 'Test Connection';
