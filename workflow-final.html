@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Serverless Portfolio Workflow</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .workflow-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+        }
+
+        .workflow-header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .workflow-title {
+            font-size: 1.5em;
+            margin: 0;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .workflow-subtitle {
+            font-size: 0.9em;
+            margin: 5px 0 0 0;
+            opacity: 0.8;
+        }
+
+        /* Step Progress Indicator */
+        .workflow-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step.completed {
+            opacity: 0.8;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #00ff00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .step.active .step-number {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .step.completed .step-number {
+            background: rgba(0, 255, 0, 0.3);
+        }
+
+        .step-label {
+            font-size: 0.7em;
+            text-align: center;
+        }
+
+        .step-connector {
+            width: 40px;
+            height: 1px;
+            background: rgba(0, 255, 0, 0.3);
+            margin: 0 5px 15px 5px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .workflow-section {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin: 0 0 20px 0;
+            color: #00ff00;
+            text-transform: uppercase;
+        }
+
+        .drop-zone {
+            border: 2px dashed #00ff00;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(0, 255, 0, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff88;
+        }
+
+        .drop-zone-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone-subtext {
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .file-details {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00ff88);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .status-success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+        }
+
+        .status-error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff6666;
+        }
+
+        .status-warning {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ffff00;
+            color: #ffff88;
+        }
+
+        .xml-preview {
+            background: rgba(0, 255, 0, 0.02);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .workflow-grid {
+                grid-template-columns: 1fr;
+            }
+            .workflow-steps {
+                flex-wrap: wrap;
+            }
+            .step-connector {
+                width: 40px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff00;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .feature-highlight {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .api-info {
+            background: rgba(0, 255, 0, 0.02);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .conversion-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .option-group {
+            background: rgba(0, 255, 0, 0.02);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 15px;
+        }
+
+        .option-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00ff00;
+        }
+
+        .slider-group {
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            height: 6px;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00ff00;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #00ff00;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .chat-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .chat-message.user {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 3px solid #00ff00;
+        }
+
+        .chat-message.assistant {
+            background: rgba(0, 255, 0, 0.05);
+            border-left: 3px solid rgba(0, 255, 0, 0.5);
+        }
+
+        .chat-input-area {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+            resize: vertical;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .chat-input-area:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .chat-container-large {
+            max-height: 600px;
+            min-height: 400px;
+            overflow-y: auto;
+        }
+
+        .xml-upload-compact {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .xml-upload-compact .btn {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="workflow-container">
+        <header class="workflow-header">
+            <h1 class="workflow-title">SERVERLESS PORTFOLIO WORKFLOW</h1>
+            <p class="workflow-subtitle">Complete Image Processing & AI Classification - No Server Required!</p>
+        </header>
+
+        <!-- Step Progress Indicator -->
+        <div class="workflow-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">API Key</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Build XML</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Process Images</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Finalize XML</div>
+            </div>
+        </div>
+
+        <!-- Step 1: API Key Confirmation -->
+        <div class="workflow-section step-content" id="step1" style="display: block;">
+            <h2 class="section-title">Step 1: Confirm API Key</h2>
+            
+            <div class="feature-highlight">
+                <strong>🔑 OpenRouter API Required:</strong> We'll use Claude 4.5 Sonnet to help build your portfolio XML and classify images
+            </div>
+
+            <div class="api-info">
+                <strong>Using OpenRouter:</strong> CORS-enabled API that supports Claude 4.5 Sonnet directly from your browser!
+                <br><a href="https://openrouter.ai/keys" target="_blank" style="color: #00ff88;">Get your API key here →</a>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label" for="openrouterApiKey">OpenRouter API Key:</label>
+                <input type="password" id="openrouterApiKey" class="input-field" placeholder="sk-or-v1-...">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label" for="aiModel">AI Model:</label>
+                <select id="aiModel" class="input-field">
+                    <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5 (Latest)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <button class="btn" id="saveApiKeyBtn">Save API Key</button>
+                <button class="btn" id="testApiKeyBtn" disabled>Test Connection</button>
+            </div>
+
+            <div id="apiStatus"></div>
+
+            <div class="input-group" style="margin-top: 30px;">
+                <button class="btn" id="nextToStep2Btn">Next: Build XML →</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Chat/XML Building -->
+        <div class="workflow-section step-content" id="step2" style="display: none;">
+            <h2 class="section-title">Step 2: Build Portfolio XML with AI</h2>
+            
+            <!-- Compact XML Upload Section -->
+            <div class="xml-upload-compact">
+                <input type="file" id="xmlFileInput" class="file-input" accept=".xml">
+                <button class="btn" id="xmlUploadBtn">Upload XML</button>
+                <button class="btn" id="loadXmlBtn">Load from Storage</button>
+                <button class="btn" id="createNewXmlBtn">Create New</button>
+                <div id="xmlStatus" style="flex: 1; padding-left: 10px; font-size: 0.9em;"></div>
+            </div>
+
+            <!-- AI Chat Assistant - Takes Most Space -->
+            <div style="margin-bottom: 15px;">
+                <h3 style="margin: 0 0 10px 0;">AI Chat Assistant</h3>
+                <div id="chatContainer" class="xml-preview chat-container-large">
+                    <div style="opacity: 0.5; text-align: center;">Chat with AI to build your portfolio XML...</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <textarea id="chatInput" class="chat-input-area" placeholder="Ask AI to help build your portfolio structure..."></textarea>
+                    <button class="btn" id="sendChatBtn" style="margin-top: 10px;">Send Message</button>
+                </div>
+            </div>
+
+            <!-- Compact Current XML Section -->
+            <div style="margin-bottom: 15px;">
+                <h3 style="margin: 0 0 10px 0;">Current XML</h3>
+                <div class="xml-preview" id="xmlPreview" style="max-height: 200px;">
+                    <div style="opacity: 0.5; text-align: center;">XML content will appear here...</div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <button class="btn" id="backToStep1Btn">← Back</button>
+                <button class="btn" id="downloadXmlBtn" disabled>Download XML</button>
+                <button class="btn" id="nextToStep3Btn" disabled>Next: Process Images →</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Image Conversion & Classification -->
+        <div class="workflow-section step-content" id="step3" style="display: none;">
+            <h2 class="section-title">Step 3: Convert & Classify Images</h2>
+            
+            <div class="workflow-grid">
+                <!-- Image Processing Section -->
+                <div>
+                    <h3>Image Processing</h3>
+                    
+                    <div class="drop-zone" id="imageDropZone">
+                        <div class="drop-zone-text">Drop images here or click to select</div>
+                        <div class="drop-zone-subtext">Supports: JPG, PNG, HEIC, BMP, TIFF, GIF</div>
+                        <input type="file" id="imageFileInput" class="file-input" multiple accept="image/*">
+                    </div>
+
+                    <div class="conversion-options">
+                        <div class="option-group">
+                            <div class="option-title">Output Size</div>
+                            <div class="slider-group">
+                                <label>Width: <span id="widthValue">1000</span>px</label>
+                                <input type="range" id="widthSlider" class="slider" min="500" max="2000" value="1000">
+                            </div>
+                            <div class="slider-group">
+                                <label>Height: <span id="heightValue">1000</span>px</label>
+                                <input type="range" id="heightSlider" class="slider" min="500" max="2000" value="1000">
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <div class="option-title">Quality Settings</div>
+                            <div class="slider-group">
+                                <label>WebP Quality: <span id="qualityValue">85</span>%</label>
+                                <input type="range" id="qualitySlider" class="slider" min="50" max="100" value="85">
+                            </div>
+                            <div class="slider-group">
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="generateThumbnails" checked>
+                                    Generate Thumbnails (200x200)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-list" id="imageFileList"></div>
+
+                    <div class="input-group">
+                        <button class="btn" id="convertImagesBtn" disabled>
+                            <span class="btn-text">Convert to WebP</span>
+                            <span class="spinner hidden"></span>
+                        </button>
+                        <button class="btn" id="downloadImagesBtn" disabled>Download All Images</button>
+                    </div>
+
+                    <div id="conversionStatus"></div>
+                </div>
+
+                <!-- AI Classification Section -->
+                <div>
+                    <h3>AI Classification</h3>
+                    
+                    <div class="api-info">
+                        <strong>Auto-Classification:</strong> AI will analyze and categorize your converted images
+                    </div>
+
+                    <div class="input-group">
+                        <button class="btn" id="classifyImagesBtn" disabled>
+                            <span class="btn-text">Classify Images with AI</span>
+                            <span class="spinner hidden"></span>
+                        </button>
+                        <button class="btn" id="manualClassifyBtn" disabled>Manual Classification</button>
+                    </div>
+
+                    <div id="classificationStatus"></div>
+
+                    <div class="xml-preview" id="classificationPreview" style="max-height: 400px;">
+                        <div style="opacity: 0.5; text-align: center;">Classification results will appear here...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 30px;">
+                <button class="btn" id="backToStep2Btn">← Back</button>
+                <button class="btn" id="nextToStep4Btn" disabled>Next: Finalize XML →</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Add Image IDs to XML -->
+        <div class="workflow-section step-content" id="step4" style="display: none;">
+            <h2 class="section-title">Step 4: Finalize XML with Image IDs</h2>
+            
+            <div class="feature-highlight">
+                <strong>✅ Final Step:</strong> Add classified image IDs to your portfolio XML
+            </div>
+
+            <div class="workflow-grid">
+                <div>
+                    <h3>Classification Summary</h3>
+                    <div class="xml-preview" id="classificationSummary" style="max-height: 400px;">
+                        <div style="opacity: 0.5; text-align: center;">Classification summary will appear here...</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>XML Updates</h3>
+                    <div class="input-group">
+                        <button class="btn" id="updateXmlBtn" disabled>Update XML with Classifications</button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <button class="btn" id="previewXmlBtn" disabled>Preview Changes</button>
+                        <button class="btn" id="resetClassificationsBtn">Reset Classifications</button>
+                    </div>
+
+                    <div class="input-group">
+                        <button class="btn" id="downloadPackageBtn" disabled>Download Complete Package</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">Final XML</h3>
+            <div class="xml-preview" id="finalXmlPreview">
+                <div style="opacity: 0.5; text-align: center;">Updated XML will appear here...</div>
+            </div>
+
+            <div id="finalStatus"></div>
+
+            <div class="input-group" style="margin-top: 30px;">
+                <button class="btn" id="backToStep3Btn">← Back</button>
+                <button class="btn" id="downloadFinalXmlBtn" disabled>Download Final XML</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="workflow-final.js"></script>
+</body>
+</html>

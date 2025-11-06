@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Workflow Manager - Manual Classification</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .workflow-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+        }
+
+        .workflow-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 20px;
+        }
+
+        .workflow-title {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .workflow-subtitle {
+            font-size: 1.2em;
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+        }
+
+        .workflow-section {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin: 0 0 20px 0;
+            color: #00ff00;
+            text-transform: uppercase;
+        }
+
+        .drop-zone {
+            border: 2px dashed #00ff00;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(0, 255, 0, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff88;
+        }
+
+        .drop-zone-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone-subtext {
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .file-details {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .status-success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+        }
+
+        .status-error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff6666;
+        }
+
+        .status-warning {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ffff00;
+            color: #ffff88;
+        }
+
+        .xml-preview {
+            background: rgba(0, 255, 0, 0.02);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .workflow-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .classification-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #00ff00;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #00ff00;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .image-preview {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+        }
+
+        .classification-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .tag-input {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .suggested-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag-suggestion {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00ff00;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag-suggestion:hover {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="workflow-container">
+        <header class="workflow-header">
+            <h1 class="workflow-title">PORTFOLIO WORKFLOW MANAGER</h1>
+            <p class="workflow-subtitle">Serverless Image Processing & XML Management</p>
+        </header>
+
+        <div class="workflow-grid">
+            <!-- Image Processing Section -->
+            <div class="workflow-section">
+                <h2 class="section-title">Image Processing</h2>
+                
+                <div class="drop-zone" id="imageDropZone">
+                    <div class="drop-zone-text">Drop images here or click to select</div>
+                    <div class="drop-zone-subtext">Supports: JPG, PNG, HEIC, BMP, TIFF, GIF</div>
+                    <input type="file" id="imageFileInput" class="file-input" multiple accept="image/*">
+                </div>
+
+                <div class="file-list" id="imageFileList"></div>
+
+                <div class="input-group">
+                    <button class="btn" id="convertImagesBtn" disabled>Convert to WebP</button>
+                    <button class="btn" id="downloadImagesBtn" disabled>Download Converted Images</button>
+                </div>
+
+                <div id="conversionStatus"></div>
+            </div>
+
+            <!-- Manual Classification Section -->
+            <div class="workflow-section">
+                <h2 class="section-title">Manual Classification</h2>
+                
+                <div class="input-group">
+                    <button class="btn" id="classifyImagesBtn" disabled>Start Manual Classification</button>
+                </div>
+
+                <div class="input-group">
+                    <div class="status-message status-warning">
+                        <strong>Manual Mode:</strong> You'll classify each image individually with a user-friendly interface.
+                    </div>
+                </div>
+
+                <div id="classificationStatus"></div>
+            </div>
+        </div>
+
+        <!-- XML Management Section -->
+        <div class="workflow-section">
+            <h2 class="section-title">XML Portfolio Management</h2>
+            
+            <div class="workflow-grid">
+                <div>
+                    <h3>Upload XML File</h3>
+                    <div class="drop-zone" id="xmlDropZone">
+                        <div class="drop-zone-text">Drop XML file here or click to select</div>
+                        <div class="drop-zone-subtext">portfolio-data.xml</div>
+                        <input type="file" id="xmlFileInput" class="file-input" accept=".xml">
+                    </div>
+                    
+                    <div class="input-group">
+                        <button class="btn" id="loadXmlBtn">Load from Browser Storage</button>
+                        <button class="btn" id="downloadXmlBtn" disabled>Download XML</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>XML Updates</h3>
+                    <div class="input-group">
+                        <button class="btn" id="updateXmlBtn" disabled>Update XML with Classifications</button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <button class="btn" id="previewXmlBtn" disabled>Preview Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="xml-preview" id="xmlPreview">
+                <div style="opacity: 0.5; text-align: center;">XML content will appear here...</div>
+            </div>
+
+            <div id="xmlStatus"></div>
+        </div>
+    </div>
+
+    <!-- Classification Modal -->
+    <div class="classification-modal hidden" id="classificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Classify Image</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            
+            <div class="progress-indicator" id="progressIndicator">
+                Image 1 of 5
+            </div>
+
+            <div class="image-preview">
+                <img class="preview-image" id="previewImage" src="" alt="Image to classify">
+            </div>
+
+            <form class="classification-form" id="classificationForm">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label" for="imageTitle">Title:</label>
+                        <input type="text" id="imageTitle" class="input-field" placeholder="Descriptive title">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="imageCategory">Category:</label>
+                        <select id="imageCategory" class="input-field">
+                            <option value="">Select category...</option>
+                            <option value="hardware">Hardware</option>
+                            <option value="software">Software</option>
+                            <option value="artwork">Artwork</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="manufacturing">Manufacturing</option>
+                            <option value="design">Design</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label" for="imageSubcategory">Subcategory:</label>
+                        <input type="text" id="imageSubcategory" class="input-field" placeholder="More specific category">
+                    </div>
+                    <div class="input-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="imageFeatured">
+                            <label for="imageFeatured">Featured Image</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="imageDescription">Description:</label>
+                    <textarea id="imageDescription" class="input-field" rows="3" placeholder="Brief description of the image"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="imageTags">Tags (comma-separated):</label>
+                    <textarea id="imageTags" class="input-field tag-input" rows="2" placeholder="tag1, tag2, tag3"></textarea>
+                    <div class="suggested-tags">
+                        <span class="tag-suggestion" onclick="addTag('portfolio')">portfolio</span>
+                        <span class="tag-suggestion" onclick="addTag('project')">project</span>
+                        <span class="tag-suggestion" onclick="addTag('engineering')">engineering</span>
+                        <span class="tag-suggestion" onclick="addTag('design')">design</span>
+                        <span class="tag-suggestion" onclick="addTag('prototype')">prototype</span>
+                        <span class="tag-suggestion" onclick="addTag('pcb')">pcb</span>
+                        <span class="tag-suggestion" onclick="addTag('3d-printing')">3d-printing</span>
+                        <span class="tag-suggestion" onclick="addTag('woodworking')">woodworking</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <button type="button" class="btn" id="skipImageBtn">Skip This Image</button>
+                    <button type="button" class="btn" id="saveClassificationBtn">Save & Next</button>
+                    <button type="button" class="btn" id="finishClassificationBtn" style="display: none;">Finish Classification</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="workflow-manual.js"></script>
+</body>
+</html>

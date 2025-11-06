@@ -1,3 +1,32 @@
+/* Workflow link styling */
+.workflow-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.configure-link {
+    color: #00ff00;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 8px 16px;
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.8);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.configure-link:hover {
+    background: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    text-shadow: 0 0 5px #00ff00;
+}
+
 /* Analog Tech Portfolio - CSS Variables */
 :root {
   /* Primary Warm Tones - Authentic Amber */
@@ -171,19 +200,6 @@ body {
     0 0 2.5px rgba(204, 136, 68, 0.2);
 }
 
-.status-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--terminal-green);
-  filter: var(--glow-terminal);
-  animation: status-blink 2s ease-in-out infinite;
-}
-
-@keyframes status-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0.3; }
-}
 
 /* Intro Content */
 .intro-content {
@@ -228,15 +244,6 @@ body {
     0 0 0.5px rgba(255, 179, 102, 0.4),
     0 0 1.5px rgba(255, 153, 102, 0.3),
     0 0 2.5px rgba(204, 136, 68, 0.2);
-}
-
-.indicator-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--terminal-green);
-  filter: var(--glow-terminal);
-  animation: status-blink 2s ease-in-out infinite;
 }
 
 /* Content Sections */
@@ -519,21 +526,6 @@ body {
     cursor: pointer;
 }
 
-/* Only apply hover effects on devices that support hover (non-touch devices) */
-@media (hover: hover) {
-    .project-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        border-color: var(--cathode-cyan);
-    }
-}
-
-/* Mobile hover class works on all devices */
-.project-card.mobile-hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border-color: var(--cathode-cyan);
-}
 
 /* Skills Matrix */
 .skills-matrix {
