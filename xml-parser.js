@@ -209,10 +209,13 @@ class PortfolioXMLParser {
         return projects.map(project => ({
             id: project.id,
             title: project.title,
-            status: project.timeframe.includes('Current') ? 'ACTIVE' : 'COMPLETED',
+            status: project.timeframe.includes('Live') ? 'LIVE'
+                : project.timeframe.includes('Current') ? 'ACTIVE'
+                : 'COMPLETED',
             description: project.description,
             technologies: project.skills.split(',').map(s => s.trim()).slice(0, 3), // First 3 skills
-            thumbnail: this.getProjectThumbnail(project) // Add thumbnail path
+            thumbnail: this.getProjectThumbnail(project), // Add thumbnail path
+            links: project.links || []
         }));
     }
     

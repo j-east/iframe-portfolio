@@ -555,7 +555,27 @@ body {
     margin-top: 15px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    gap: 8px 16px;
+}
+
+/* Real external link on the tile — unmistakably a hyperlink */
+.tile-link {
+    color: var(--cathode-cyan);
+    font-family: var(--font-mono, monospace);
+    font-size: 0.85rem;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    text-shadow: 0 0 6px rgba(77, 217, 217, 0.7), 0 0 14px rgba(77, 217, 217, 0.35);
+    transition: all 0.25s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.tile-link:hover {
+    color: var(--terminal-green);
+    text-shadow: 0 0 8px rgba(77, 255, 136, 0.8), 0 0 18px rgba(77, 255, 136, 0.4);
 }
 
 .project-link {

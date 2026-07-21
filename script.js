@@ -38,21 +38,11 @@ class PortfolioController {
     setupProjectNavigation() {
         // Set up project card click handlers
         document.addEventListener('click', (e) => {
-            // Check if click was on thumbnail image
-            const thumbnailImage = e.target.closest('.image-thumbnail');
-            if (thumbnailImage) {
-                e.stopPropagation(); // Prevent project card click
-                const projectCard = thumbnailImage.closest('.project-card');
-                if (projectCard) {
-                    const projectId = projectCard.dataset.projectId;
-                    if (projectId && projectId !== 'undefined') {
-                        this.openThumbnailImage(projectId);
-                    }
-                }
-                return;
-            }
-            
-            // Handle regular project card clicks
+            // Real links inside cards navigate — don't hijack them into the modal
+            if (e.target.closest('a')) return;
+
+            // Handle regular project card clicks (thumbnail included — the whole
+            // card, hero image and all, opens the project page)
             const projectCard = e.target.closest('.project-card');
             if (projectCard) {
                 const projectId = projectCard.dataset.projectId;
@@ -814,6 +804,10 @@ class PortfolioController {
                             ${project.technologies ? project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('') : ''}
                         </div>
                         <div class="project-links">
+                            ${(() => {
+                                const primary = (project.links || []).find(l => l.type === 'website') || (project.links || [])[0];
+                                return primary ? `<a href="${primary.url}" target="_blank" rel="noopener" class="tile-link">${primary.label || primary.url.replace(/^https?:\/\//, '')}&nbsp;↗</a>` : '';
+                            })()}
                             <span class="project-link">EXPLORE PROJECT →</span>
                         </div>
                     </div>
@@ -1111,20 +1105,24 @@ const additionalStyles = `
 }
 
 .project-link-detail {
-    background: var(--cathode-cyan);
-    color: var(--black-pure);
-    padding: 8px 16px;
-    border-radius: 4px;
+    color: var(--cathode-cyan);
     font-family: var(--font-mono);
-    font-size: 0.9rem;
-    text-decoration: none;
-    filter: var(--glow-cyan);
-    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    text-shadow: 0 0 6px rgba(77, 217, 217, 0.7), 0 0 14px rgba(77, 217, 217, 0.35);
+    transition: all 0.25s ease;
+}
+
+.project-link-detail::after {
+    content: ' ↗';
+    font-size: 0.85em;
 }
 
 .project-link-detail:hover {
-    background: var(--cathode-cyan-deep);
-    transform: translateY(-2px);
+    color: var(--terminal-green);
+    text-shadow: 0 0 8px rgba(77, 255, 136, 0.8), 0 0 18px rgba(77, 255, 136, 0.4);
 }
 
 @media (max-width: 768px) {

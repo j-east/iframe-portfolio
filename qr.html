@@ -147,9 +147,32 @@
     text-transform: uppercase;
     text-align: center;
     text-shadow: 0 0 10px rgba(255,204,179,0.6);
-    line-height: 2;
+    line-height: 2.1;
   }
-  .tagline .url { color: var(--cathode-cyan); letter-spacing: 0.12em; text-transform: none; }
+  .tagline .name {
+    display: block;
+    color: var(--cream);
+    font-size: clamp(16px, 3.6vw, 24px);
+    font-weight: 700;
+    letter-spacing: 0.34em;
+    text-shadow: 0 0 14px rgba(255,179,102,0.85), 0 0 34px rgba(255,153,128,0.4);
+    margin-bottom: 2px;
+  }
+  .tagline a {
+    color: var(--cathode-cyan);
+    letter-spacing: 0.1em;
+    text-transform: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    text-shadow: 0 0 8px rgba(77,217,217,0.8), 0 0 18px rgba(77,217,217,0.35);
+    transition: color 0.25s ease, text-shadow 0.25s ease;
+  }
+  .tagline a:hover, .tagline a:focus-visible {
+    color: var(--terminal-green);
+    text-shadow: 0 0 10px rgba(77,255,136,0.9), 0 0 22px rgba(77,255,136,0.45);
+  }
+  .tagline .sep { color: var(--amber-glow); }
 
   /* ambient particles drifting upward — tiny hopeful sparks */
   .spark {
@@ -180,7 +203,14 @@
   <main class="stage">
     <div class="kicker">Point your camera<br>at the <b>future</b></div>
     <div class="frame"><canvas id="qr" width="450" height="450" role="img" aria-label="QR code linking to John Evans' portfolio"></canvas></div>
-    <div class="tagline">John Evans · Portfolio<br><span class="url">j-east.github.io/iframe-portfolio</span></div>
+    <div class="tagline">
+      <span class="name">John Evans</span>
+      <a href="https://dot.cards/fabernovus" target="_blank" rel="noopener">dot.cards/fabernovus</a><br>
+      <a href="mailto:jevans@ashfordbriggs.com">jevans@ashfordbriggs.com</a>
+      <span class="sep">·</span>
+      <a href="mailto:jevans@paladinrecruiter.com">jevans@paladinrecruiter.com</a><br>
+      <a href="https://j-east.github.io/iframe-portfolio/">j-east.github.io/iframe-portfolio</a>
+    </div>
   </main>
 
 <script>
