@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Scan · John Evans Portfolio</title>
+<meta name="description" content="Point your camera at the future — John Evans' portfolio.">
+<style>
+  :root {
+    --amber-glow: #FFB366;
+    --amber-deep: #CC8844;
+    --amber-core: #FFCC88;
+    --cathode-cyan: #4DD9D9;
+    --phosphor-green: #7FBF5F;
+    --terminal-green: #4DFF88;
+    --mint-glow: #7FD9A6;
+    --cream: #F2E6D9;
+    --peach-sky: #F2C4A6;
+    --peach-haze: #FFCCB3;
+    --salmon: #FF9980;
+    --night: #141019;
+    --ink: #1A1410;
+    --mono: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--mono);
+    background: var(--night);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* ── sky: dawn gradient of the optimistic future ── */
+  .sky {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg,
+      #141019 0%,
+      #2a1f33 22%,
+      #6b3d55 40%,
+      #cc6655 52%,
+      var(--salmon) 58%,
+      var(--peach-haze) 64%,
+      var(--amber-core) 68%);
+    z-index: -3;
+  }
+
+  /* banded retro sun rising behind everything */
+  .sun {
+    position: fixed;
+    left: 50%;
+    top: 60%;
+    width: min(76vmin, 560px);
+    height: min(76vmin, 560px);
+    transform: translate(-50%, -38%);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--amber-core) 0%, var(--amber-glow) 45%, var(--salmon) 72%, transparent 74%);
+    -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 5.2%, transparent 5.2% 8%);
+    mask-image: repeating-linear-gradient(180deg, #000 0 5.2%, transparent 5.2% 8%);
+    filter: blur(0.5px);
+    opacity: 0.95;
+    z-index: -2;
+  }
+
+  /* ── grid floor gliding toward the viewer ── */
+  .floor {
+    position: fixed;
+    left: -25vw;
+    right: -25vw;
+    bottom: 0;
+    height: 42vh;
+    background-image:
+      linear-gradient(to top, rgba(20,16,25,0) 0%, rgba(20,16,25,0.85) 96%),
+      repeating-linear-gradient(90deg, var(--cathode-cyan) 0 2px, transparent 2px 72px),
+      repeating-linear-gradient(0deg, var(--cathode-cyan) 0 2px, transparent 2px 46px);
+    transform: perspective(420px) rotateX(62deg);
+    transform-origin: 50% 100%;
+    animation: glide 3.2s linear infinite;
+    opacity: 0.55;
+    z-index: -1;
+  }
+  @keyframes glide { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 0 0, 0 0, 0 46px; } }
+
+  /* ── the artifact ── */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    padding: 24px;
+    z-index: 1;
+  }
+  .kicker {
+    color: var(--cream);
+    font-size: clamp(11px, 2.6vw, 14px);
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255,179,102,0.8);
+    text-align: center;
+  }
+  .kicker b { color: var(--terminal-green); font-weight: 700; text-shadow: 0 0 14px rgba(77,255,136,0.9); }
+
+  .frame {
+    position: relative;
+    padding: 18px;
+    background: linear-gradient(150deg, #241c17, #17120e);
+    border: 2px solid var(--amber-deep);
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 4px rgba(26,20,16,0.9),
+      0 0 44px rgba(255,179,102,0.45),
+      0 0 120px rgba(77,217,217,0.25),
+      inset 0 0 24px rgba(0,0,0,0.6);
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(26,20,16,0.9), 0 0 44px rgba(255,179,102,0.45), 0 0 120px rgba(77,217,217,0.25), inset 0 0 24px rgba(0,0,0,0.6); }
+    50% { box-shadow: 0 0 0 4px rgba(26,20,16,0.9), 0 0 64px rgba(255,153,128,0.6), 0 0 150px rgba(127,191,95,0.35), inset 0 0 24px rgba(0,0,0,0.6); }
+  }
+  .frame::after {   /* CRT scanlines over the code */
+    content: "";
+    position: absolute;
+    inset: 18px;
+    border-radius: 4px;
+    background: repeating-linear-gradient(180deg, rgba(0,0,0,0.14) 0 2px, transparent 2px 4px);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+  canvas {
+    display: block;
+    width: min(64vmin, 420px);
+    height: min(64vmin, 420px);
+    image-rendering: pixelated;
+    border-radius: 4px;
+  }
+
+  .tagline {
+    color: var(--peach-haze);
+    font-size: clamp(10px, 2.2vw, 12.5px);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255,204,179,0.6);
+    line-height: 2;
+  }
+  .tagline .url { color: var(--cathode-cyan); letter-spacing: 0.12em; text-transform: none; }
+
+  /* ambient particles drifting upward — tiny hopeful sparks */
+  .spark {
+    position: fixed;
+    bottom: -8px;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    animation: rise linear infinite;
+    z-index: 0;
+  }
+  @keyframes rise {
+    from { transform: translateY(0); opacity: 0; }
+    12% { opacity: 0.9; }
+    to { transform: translateY(-105vh); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floor, .frame { animation: none; }
+    .spark { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="sky"></div>
+  <div class="sun"></div>
+  <div class="floor"></div>
+
+  <main class="stage">
+    <div class="kicker">Point your camera<br>at the <b>future</b></div>
+    <div class="frame"><canvas id="qr" width="450" height="450" role="img" aria-label="QR code linking to John Evans' portfolio"></canvas></div>
+    <div class="tagline">John Evans · Portfolio<br><span class="url">j-east.github.io/iframe-portfolio</span></div>
+  </main>
+
+<script>
+(function () {
+  // 37×37 QR, ECC level H → https://j-east.github.io/iframe-portfolio/
+  const ROWS = ["1111111010001110000100000000101111111","1000001011001100110100000001001000001","1011101011110110101101010011101011101","1011101001110101100111100111001011101","1011101001001010011001011100001011101","1000001010110100111000010111101000001","1111111010101010101010101010101111111","0000000010100100110101100010100000000","0011101011101111010100001100011100111","1010000001010001100111111100100100100","1110101010101000100101011111101010111","0011100010001111001001000011001100000","0100011111110010100010001110011010110","1011010000010100101110101100110101100","1101111011011110101100110001010111011","1000000001001011100011001000000110011","1100011110001010100101100111111010111","0111000010000010100000001110100001000","0111001000001000101111111011100000011","0110000010100101001010110011011100000","0001111010001001101001110110011110100","0001110101111101010100000100000101100","0011001000010010100011010111010000011","0110100100011100000110100010010100001","1000001000011000000000010000011011101","1110100001111011001100101100100101000","1001001010111110110101100101001001101","1000010011011011111100001001110100000","1010101110001000011111100100111110101","0000000011001001010111110000100010000","1111111000101101011111000010101011011","1000001000100011000010000010100010011","1011101011110001011111011111111110110","1011101010100101001011000001101011000","1011101011001001101000111010010000101","1000001000010000010110110011111110001","1111111001110111100000011100010110111"];
+  const N = ROWS.length;
+  const QUIET = 3;                      // quiet-zone modules on each side
+  const TOTAL = N + QUIET * 2;
+
+  const canvas = document.getElementById("qr");
+  const ctx = canvas.getContext("2d");
+  const CELL = Math.floor(canvas.width / TOTAL);
+  const PAD = Math.floor((canvas.width - CELL * TOTAL) / 2);
+  const DARK = "#17120C";
+
+  // The optimism palette — light cells only, so the code always scans.
+  const STOPS = [
+    [255, 204, 136],  // amber core
+    [255, 153, 128],  // salmon
+    [242, 230, 217],  // cream
+    [127, 217, 166],  // mint glow
+    [77, 255, 136],   // terminal green
+    [77, 217, 217],   // cathode cyan
+    [242, 196, 166],  // peach sky
+  ];
+  function palette(t) {
+    t = ((t % 1) + 1) % 1;
+    const f = t * STOPS.length;
+    const i = Math.floor(f) % STOPS.length;
+    const j = (i + 1) % STOPS.length;
+    const k = f - Math.floor(f);
+    const a = STOPS[i], b = STOPS[j];
+    return `rgb(${(a[0]+(b[0]-a[0])*k)|0},${(a[1]+(b[1]-a[1])*k)|0},${(a[2]+(b[2]-a[2])*k)|0})`;
+  }
+
+  const cx = TOTAL / 2, cy = TOTAL / 2;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function draw(ms) {
+    const t = ms / 1000;
+    for (let y = 0; y < TOTAL; y++) {
+      for (let x = 0; x < TOTAL; x++) {
+        const qx = x - QUIET, qy = y - QUIET;
+        const dark = qx >= 0 && qy >= 0 && qx < N && qy < N && ROWS[qy][qx] === "1";
+        if (dark) {
+          ctx.fillStyle = DARK;
+        } else {
+          // psychedelic drift: radial waves + a slow swirl, quantized gently by cell
+          const dx = x - cx, dy = y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy) / TOTAL;
+          const ang = Math.atan2(dy, dx) / (Math.PI * 2);
+          ctx.fillStyle = palette(dist * 1.35 - t * 0.11 + ang * 0.5 + Math.sin(t * 0.35 + dist * 6) * 0.05);
+        }
+        ctx.fillRect(PAD + x * CELL, PAD + y * CELL, CELL, CELL);
+      }
+    }
+  }
+
+  if (reduced) {
+    draw(9000);          // one pleasing static frame
+  } else {
+    let last = 0;
+    (function loop(ms) {
+      if (ms - last > 66) { draw(ms); last = ms; }   // ~15fps — smooth enough, easy on batteries
+      requestAnimationFrame(loop);
+    })(0);
+  }
+
+  // hopeful sparks
+  if (!reduced) {
+    const colors = ["#FFB366", "#4DD9D9", "#7FBF5F", "#FF9980", "#F2E6D9"];
+    for (let i = 0; i < 26; i++) {
+      const s = document.createElement("div");
+      s.className = "spark";
+      s.style.left = (Math.random() * 100) + "vw";
+      s.style.background = colors[i % colors.length];
+      s.style.boxShadow = `0 0 6px ${colors[i % colors.length]}`;
+      s.style.animationDuration = (7 + Math.random() * 9) + "s";
+      s.style.animationDelay = (-Math.random() * 16) + "s";
+      document.body.appendChild(s);
+    }
+  }
+})();
+</script>
+</body>
+</html>

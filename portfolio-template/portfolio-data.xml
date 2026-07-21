@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<portfolio version="25.11.07.0">
+<portfolio version="26.07.21.0">
     <meta>
         <name>John Evans</name>
         <tagline>Hardware Engineer • Software Developer • Maker</tagline>
@@ -28,17 +28,116 @@
             <domain name="Embedded Systems" years="8" level="expert" description="Medical devices, audio equipment, navigation hardware, drone systems using nRF52840, Teensy, Arduino platforms"/>
             <domain name="Hardware Design" years="6" level="advanced" description="PCB design with KiCad/Eagle/Altium, 3D modeling with SolidWorks/AutoCAD/Fusion360, audio amplifiers, power conversion"/>
             <domain name="Computer Vision" years="4" level="advanced" description="Eye tracking systems, multi-camera processing, 154-star GitHub project, featured on Hackaday"/>
-            <domain name="AI/ML" years="2" level="advanced" description="AI communication platforms, transparent AI systems, FaberNovus platform development"/>
+            <domain name="AI/ML" years="3" level="expert" description="Agent infrastructure: MCP servers published to npm and the official MCP Registry, Claude Code sidecars, autonomous agent loops, RAG platforms, AI communication systems"/>
             <domain name="Maritime Navigation" years="2" level="advanced" description="Custom GIS software, NOAA ENC chart integration, GPS wristwatch with map view and telemetry"/>
         </technical_domains>
         
         <specialized_skills>
+            <skill name="Agent Infrastructure" years="2" proficiency="expert" contexts="MCP server development and publishing, Claude Code sidecars, autonomous scheduled agents, Web Push PWAs, token-scoped agent APIs"/>
             <skill name="Navigation" years="2" proficiency="advanced" contexts="Marine navigation, Offshore passage making, Chart plotting and GPS systems"/>
             <skill name="Sailing" years="5" proficiency="expert" contexts="Offshore cruising, Caribbean sailing, Boat systems and maintenance"/>
             <skill name="Manufacturing" years="4" proficiency="advanced" contexts="PCB assembly, Quality control, Supply chain management"/>
             <skill name="Business Development" years="3" proficiency="advanced" contexts="Client relationship management, Contract negotiation, Technical communication"/>
         </specialized_skills>
     </skills>
+
+    <project id="terrain-boards" featured="true">
+        <title>TerrainMaps</title>
+        <subtitle>Turn Any Place on Earth into a 3D-Printed Board</subtitle>
+        <timeframe>Live — 2026</timeframe>
+        <category>software,geospatial,3d-printing,ai</category>
+        <links>
+            <link type="website" label="terrainmaps.land">https://terrainmaps.land</link>
+        </links>
+        <description>
+            A full pipeline from public-domain elevation data to a full-color 3D-printable terrain board, entirely in the browser. Search any place — or upload a GPX of a favorite ride — and watch it become a printable model with an interactive 3D preview. Free downloads, with print ordering for physical boards.
+        </description>
+        <highlights>
+            <highlight>Elevation-to-3MF engine built on public-domain USGS 3DEP and NOAA terrain data</highlight>
+            <highlight>Full-color streamed 3MF generation for multi-material printing</highlight>
+            <highlight>In-browser 3D preview with remixable boards and community gallery</highlight>
+            <highlight>GPX route boards: any hike, ride, or drive becomes a physical keepsake</highlight>
+            <highlight>Golf course mode with fairway detection from public-domain NAIP imagery</highlight>
+        </highlights>
+        <skills>Python, Geospatial Processing, DEM/Terrain Data, 3MF/3D Printing, Web Workers, Three.js, PostgreSQL, Docker/Coolify</skills>
+        <images>
+            <image rank="hero" description="TerrainMaps live site showing a featured 3D golf course board">terrain-boards_live-site_hero.webp</image>
+            <image rank="featured" description="3D route board render with numbered waypoint path across island terrain">terrain-boards_route-board-3d_feature.webp</image>
+            <image rank="standard" description="Deer Isle Maine coastline terrain processing view">terrain-boards_deer-isle-coastline_standard.webp</image>
+        </images>
+    </project>
+
+    <project id="launch-engine" featured="true">
+        <title>Launch Engine</title>
+        <subtitle>AI Launch Co-Pilot with a Living Mind Map</subtitle>
+        <timeframe>Live — 2026</timeframe>
+        <category>software,ai,web</category>
+        <links>
+            <link type="website" label="runway.pathwriter.world">https://runway.pathwriter.world</link>
+            <link type="github" label="GitHub Repository">https://github.com/j-east/launch-engine</link>
+        </links>
+        <description>
+            A launch planning tool where an AI co-pilot and a founder share one canvas. Describe a product and the co-pilot fills out a build/market mind map, then keeps re-planning it as work happens — every action item sized to fifteen minutes so momentum never stalls.
+        </description>
+        <highlights>
+            <highlight>Dual-hemisphere mind map: material (build) and immaterial (market) branches around one vision</highlight>
+            <highlight>AI co-pilot fills, re-plans, and converses per-node with persistent context</highlight>
+            <highlight>15-minute momentum system: every task completable in one sitting</highlight>
+            <highlight>Intake → invest/simulate → schedule → check-ins pipeline for full launch lifecycle</highlight>
+            <highlight>Claude Code sidecar provides the intelligence on a subscription, not per-token billing</highlight>
+        </highlights>
+        <skills>Angular, TypeScript, Node.js, PostgreSQL JSONB, Claude Integration, Canvas Rendering, Docker/Coolify</skills>
+        <images>
+            <image rank="hero" description="Launch Engine mind map with AI co-pilot chat panel and demo product">launch-engine_mind-map_hero.webp</image>
+        </images>
+    </project>
+
+    <project id="charttable-agents" featured="true">
+        <title>ChartTable &amp; Open Shannon</title>
+        <subtitle>A Personal Knowledge Base That Holds Me Accountable</subtitle>
+        <timeframe>Live — 2026</timeframe>
+        <category>software,ai,agents,knowledge-base</category>
+        <description>
+            A personal operating picture: 2,200+ AI conversations indexed into a 2,700-node taxonomy, served to agents over MCP, with an autonomous strategist that reviews every week's work against a 90-day plan and publishes its verdict to a token-gated iPhone app. Agents read it, write to it, and answer for it — the system only respects what's written down.
+        </description>
+        <highlights>
+            <highlight>Open Shannon: MCP server + Claude Code sidecar bridging agents to the knowledge graph (23 tools)</highlight>
+            <highlight>Autonomous weekly review: a scheduled agent judges the week from live data and publishes a blunt verdict</highlight>
+            <highlight>Token-gated PWA with Web Push: the Monday memo lands on the lock screen, actions check off from the phone</highlight>
+            <highlight>URL-embedded revocable agent keys — one link carries scoped read/write for any agent or webhook</highlight>
+            <highlight>In-app conversational agent that edits projects and searches the graph in natural language</highlight>
+        </highlights>
+        <skills>.NET 10, Angular, PostgreSQL, MCP Protocol, Claude Code, Web Push/VAPID, Service Workers, Agent Orchestration</skills>
+        <images>
+            <image rank="hero" description="The Monday memo — weekly strategist verdict app with scores and next actions">charttable-agents_monday-memo_hero.webp</image>
+        </images>
+    </project>
+
+    <project id="pixel-surgeon" featured="true">
+        <title>Pixel Surgeon MCP</title>
+        <subtitle>AI Image Generation &amp; Repair for Agents</subtitle>
+        <timeframe>Open Source — 2026</timeframe>
+        <category>software,ai,open-source,mcp</category>
+        <links>
+            <link type="github" label="GitHub Repository">https://github.com/j-east/pixel-surgeon-mcp</link>
+            <link type="website" label="npm Package">https://www.npmjs.com/package/pixel-surgeon-mcp</link>
+        </links>
+        <description>
+            An MCP server that gives any AI agent professional image capabilities: generation, editing, and surgical region repair with an interactive browser crop UI. Published on npm and the official MCP Registry.
+        </description>
+        <highlights>
+            <highlight>Published on npm and the official Model Context Protocol Registry</highlight>
+            <highlight>Multi-provider: Gemini, OpenAI, and Grok image models behind one interface</highlight>
+            <highlight>Interactive region repair — browser crop UI for pixel-precise AI inpainting</highlight>
+            <highlight>Background removal, SVG tracing, video generation, and style presets</highlight>
+            <highlight>Every image in this portfolio's AI-era entries passed through it</highlight>
+        </highlights>
+        <skills>TypeScript, MCP Protocol, Node.js, sharp, Image Processing, npm Publishing</skills>
+        <images>
+            <image rank="hero" description="Retro-futurist Pixel Surgeon poster generated by the tool itself">pixel-surgeon_retro-poster_hero.webp</image>
+            <image rank="standard" description="Strategist app icon designed with Pixel Surgeon">pixel-surgeon_strategist-app-icon_standard.webp</image>
+        </images>
+    </project>
 
     <project id="downeastaudio" featured="true">
         <title>Downeast Audio</title>
