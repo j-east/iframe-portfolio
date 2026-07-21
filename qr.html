@@ -292,13 +292,14 @@ let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
 } catch (e) { canvas.remove(); throw e; }   // no WebGL → dawn sky stands alone
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, 3));
 
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
 camera.position.z = 2;
 
-const COUNT = reduced ? 45000 : 90000;
+const MOBILE = matchMedia("(pointer: coarse)").matches;
+const COUNT = reduced ? 60000 : MOBILE ? 90000 : 160000;
 const positions = new Float32Array(COUNT * 3);
 const colors = new Float32Array(COUNT * 3);
 const px = new Float32Array(COUNT);
@@ -309,10 +310,10 @@ const geometry = new THREE.BufferGeometry();
 geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 const material = new THREE.PointsMaterial({
-  size: 1.4 * Math.min(devicePixelRatio, 2),
+  size: 1.0 * Math.min(devicePixelRatio, 2),
   vertexColors: true,
   transparent: true,
-  opacity: 0.42,
+  opacity: 0.5,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
   sizeAttenuation: false,
@@ -394,7 +395,7 @@ function stepParticles(a, b, c, d, t) {
 
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.1);
-  hue += dt * 0.012;
+  hue += dt * 0.028;   // the ChaosRenders color-shift mode, finally implemented — gentle, ~35s per full palette cycle
   morph += dt / MORPH_SECONDS;
   if (morph >= 1) {
     morph = 0;
