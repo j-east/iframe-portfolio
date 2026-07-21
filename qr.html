@@ -128,7 +128,7 @@
     position: absolute;
     inset: 18px;
     border-radius: 4px;
-    background: repeating-linear-gradient(180deg, rgba(0,0,0,0.14) 0 2px, transparent 2px 4px);
+    background: repeating-linear-gradient(180deg, rgba(0,0,0,0.06) 0 2px, transparent 2px 4px);
     pointer-events: none;
     mix-blend-mode: multiply;
   }
@@ -199,27 +199,59 @@
 
   // The optimism palette — light cells only, so the code always scans.
   const STOPS = [
-    [255, 204, 136],  // amber core
-    [255, 153, 128],  // salmon
+    [255, 210, 150],  // amber core
+    [255, 178, 156],  // salmon (lightened — keeps decode margin)
     [242, 230, 217],  // cream
-    [127, 217, 166],  // mint glow
-    [77, 255, 136],   // terminal green
-    [77, 217, 217],   // cathode cyan
-    [242, 196, 166],  // peach sky
+    [150, 226, 182],  // mint glow
+    [128, 255, 170],  // terminal green (lightened)
+    [130, 230, 230],  // cathode cyan (lightened)
+    [246, 208, 182],  // peach sky
   ];
-  function palette(t) {
-    t = ((t % 1) + 1) % 1;
-    const f = t * STOPS.length;
-    const i = Math.floor(f) % STOPS.length;
-    const j = (i + 1) % STOPS.length;
-    const k = f - Math.floor(f);
-    const a = STOPS[i], b = STOPS[j];
-    return `rgb(${(a[0]+(b[0]-a[0])*k)|0},${(a[1]+(b[1]-a[1])*k)|0},${(a[2]+(b[2]-a[2])*k)|0})`;
-  }
-
   const cx = TOTAL / 2, cy = TOTAL / 2;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // ── organic life ──────────────────────────────────────────────
+  // A continuous-energy cellular automaton (Life with soft edges):
+  // each cell holds energy 0..1; a neighborhood sum near the Life
+  // sweet spot (~2–3 living neighbors) pulls energy up, anything
+  // else lets it decay. Colonies bloom, drift, and dissolve instead
+  // of blinking. It runs across the whole grid, but only light
+  // cells display it — the ink modules never change, so it scans.
+  const cells = new Float32Array(TOTAL * TOTAL);
+  const next = new Float32Array(TOTAL * TOTAL);
+  const idx = (x, y) => ((y + TOTAL) % TOTAL) * TOTAL + ((x + TOTAL) % TOTAL);
+
+  function seedBlob() {
+    const bx = Math.random() * TOTAL, by = Math.random() * TOTAL, r = 2 + Math.random() * 3;
+    for (let y = 0; y < TOTAL; y++) for (let x = 0; x < TOTAL; x++) {
+      const d = Math.hypot(x - bx, y - by);
+      if (d < r) cells[idx(x, y)] = Math.max(cells[idx(x, y)], 0.9 - d / r * 0.4 + Math.random() * 0.1);
+    }
+  }
+  for (let i = 0; i < 6; i++) seedBlob();
+
+  function stepLife() {
+    let total = 0;
+    for (let y = 0; y < TOTAL; y++) {
+      for (let x = 0; x < TOTAL; x++) {
+        const e = cells[idx(x, y)];
+        const s =
+          cells[idx(x-1,y-1)] + cells[idx(x,y-1)] + cells[idx(x+1,y-1)] +
+          cells[idx(x-1,y  )]                     + cells[idx(x+1,y  )] +
+          cells[idx(x-1,y+1)] + cells[idx(x,y+1)] + cells[idx(x+1,y+1)];
+        // soft Life: sweet spot ~2.6 living neighbors, gaussian falloff
+        const growth = Math.exp(-Math.pow((s - 2.6) / 1.05, 2));
+        let v = e + (growth - e) * 0.22;
+        v += (Math.random() - 0.5) * 0.012;          // metabolic noise
+        next[idx(x, y)] = Math.max(0, Math.min(1, v));
+        total += v;
+      }
+    }
+    cells.set(next);
+    if (total / (TOTAL * TOTAL) < 0.05) { seedBlob(); seedBlob(); seedBlob(); }
+  }
+
+  const CREAM = [242, 230, 217];
   function draw(ms) {
     const t = ms / 1000;
     for (let y = 0; y < TOTAL; y++) {
@@ -229,23 +261,37 @@
         if (dark) {
           ctx.fillStyle = DARK;
         } else {
-          // psychedelic drift: radial waves + a slow swirl, quantized gently by cell
+          const e = cells[idx(x, y)];
           const dx = x - cx, dy = y - cy;
           const dist = Math.sqrt(dx * dx + dy * dy) / TOTAL;
-          const ang = Math.atan2(dy, dx) / (Math.PI * 2);
-          ctx.fillStyle = palette(dist * 1.35 - t * 0.11 + ang * 0.5 + Math.sin(t * 0.35 + dist * 6) * 0.05);
+          // living cells glow through the palette; dormant cells rest at warm cream
+          const c = paletteRGB(e * 0.62 + t * 0.02 + dist * 0.22);
+          const k = Math.pow(e, 0.8) * 0.85;         // how far from cream toward the colony color — verified scannable; don't raise without re-decoding a screenshot
+          ctx.fillStyle = `rgb(${(CREAM[0]+(c[0]-CREAM[0])*k)|0},${(CREAM[1]+(c[1]-CREAM[1])*k)|0},${(CREAM[2]+(c[2]-CREAM[2])*k)|0})`;
         }
         ctx.fillRect(PAD + x * CELL, PAD + y * CELL, CELL, CELL);
       }
     }
   }
 
+  function paletteRGB(t) {
+    t = ((t % 1) + 1) % 1;
+    const f = t * STOPS.length;
+    const i = Math.floor(f) % STOPS.length;
+    const j = (i + 1) % STOPS.length;
+    const k = f - Math.floor(f);
+    const a = STOPS[i], b = STOPS[j];
+    return [a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k];
+  }
+
   if (reduced) {
-    draw(9000);          // one pleasing static frame
+    for (let i = 0; i < 40; i++) stepLife();   // let colonies form, show one calm frame
+    draw(9000);
   } else {
-    let last = 0;
+    let lastStep = 0, lastDraw = 0;
     (function loop(ms) {
-      if (ms - last > 66) { draw(ms); last = ms; }   // ~15fps — smooth enough, easy on batteries
+      if (ms - lastStep > 110) { stepLife(); lastStep = ms; }   // ~9 generations/s
+      if (ms - lastDraw > 66) { draw(ms); lastDraw = ms; }      // ~15fps render
       requestAnimationFrame(loop);
     })(0);
   }

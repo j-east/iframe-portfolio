@@ -139,6 +139,48 @@
         </images>
     </project>
 
+    <project id="paladin" featured="true">
+        <title>Paladin</title>
+        <subtitle>AI-Powered Recruiting Platform with a Live-Call Copilot</subtitle>
+        <timeframe>Professional Work — 2025–Present</timeframe>
+        <category>software,ai,telephony,professional</category>
+        <description>
+            A full-stack recruiting platform where AI sits inside the phone call: a browser call console with PBX telephony streams live audio, transcribes it in real time, and runs an intelligence overlay that analyzes the recruiting conversation as it happens — backed by a CRM that both humans and AI agents work.
+        </description>
+        <highlights>
+            <highlight>Browser call console: WebSocket audio streaming over PBX telephony with real-time transcription</highlight>
+            <highlight>Live AI intelligence overlay analyzing recruiting conversations mid-call</highlight>
+            <highlight>Recruiting CRM: accounts, contacts, opportunity pipeline, email integration, activity and billing tracking</highlight>
+            <highlight>MCP server exposing the CRM to AI agents with per-recruiter scoped keys</highlight>
+            <highlight>Single codebase, per-deployment product modes for different customer types</highlight>
+        </highlights>
+        <skills>.NET, Angular, PBX/Telephony Integration, WebSockets, Real-Time Transcription, MCP Protocol, PostgreSQL, AI Orchestration</skills>
+        <images>
+            <image rank="hero" description="Paladin illustrated poster — knight helmet with headset, live transcript and pipeline">paladin_recruiting-poster_hero.webp</image>
+        </images>
+    </project>
+
+    <project id="project-viper" featured="true">
+        <title>Project Viper</title>
+        <subtitle>Fine-Tuned Vision Models for Real-Time Inspection</subtitle>
+        <timeframe>Professional Work — 2026</timeframe>
+        <category>software,ai,computer-vision,professional</category>
+        <description>
+            An AI visual inspection system for high-stakes maintenance training: instructional video goes in one end, and a fine-tuned vision-language model that can evaluate a technician's work in real time comes out the other. I built the end-to-end pipeline — from raw video to trained model to automated scoring.
+        </description>
+        <highlights>
+            <highlight>Automated video-to-dataset pipeline: transcription, AI semantic chunking, frame-label alignment</highlight>
+            <highlight>LoRA fine-tuning of multimodal vision-language models on local GPU infrastructure</highlight>
+            <highlight>LLM-as-judge evaluation framework scoring model outputs against ground truth</highlight>
+            <highlight>Measurable accuracy gains over base models, validated by automated evaluation</highlight>
+            <highlight>Fully reproducible: a new training video runs the whole pipeline without manual intervention</highlight>
+        </highlights>
+        <skills>Vision-Language Models, LoRA Fine-Tuning, Python, Unsloth, Whisper, ffmpeg, Dataset Engineering, LLM Evaluation, GPU Infrastructure</skills>
+        <images>
+            <image rank="hero" description="Viper technical infographic — video frame analysis flowing through a neural network to an evaluation score">project-viper_inspection-poster_hero.webp</image>
+        </images>
+    </project>
+
     <project id="downeastaudio" featured="true">
         <title>Downeast Audio</title>
         <subtitle>High-Fidelity Bluetooth Speaker Company</subtitle>
