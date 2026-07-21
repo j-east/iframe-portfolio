@@ -15,11 +15,9 @@
     --terminal-green: #4DFF88;
     --mint-glow: #7FD9A6;
     --cream: #F2E6D9;
-    --peach-sky: #F2C4A6;
     --peach-haze: #FFCCB3;
     --salmon: #FF9980;
     --night: #141019;
-    --ink: #1A1410;
     --mono: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,30 +40,22 @@
     inset: 0;
     background: linear-gradient(180deg,
       #141019 0%,
-      #2a1f33 22%,
-      #6b3d55 40%,
-      #cc6655 52%,
-      var(--salmon) 58%,
-      var(--peach-haze) 64%,
-      var(--amber-core) 68%);
-    z-index: -3;
+      #251b2e 30%,
+      #4d3048 52%,
+      #a05248 66%,
+      var(--salmon) 74%,
+      var(--peach-haze) 80%,
+      var(--amber-core) 86%);
+    z-index: -4;
   }
 
-  /* banded retro sun rising behind everything */
-  .sun {
+  /* the attractor — chaos is the new sun */
+  #chaos {
     position: fixed;
-    left: 50%;
-    top: 60%;
-    width: min(76vmin, 560px);
-    height: min(76vmin, 560px);
-    transform: translate(-50%, -38%);
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--amber-core) 0%, var(--amber-glow) 45%, var(--salmon) 72%, transparent 74%);
-    -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 5.2%, transparent 5.2% 8%);
-    mask-image: repeating-linear-gradient(180deg, #000 0 5.2%, transparent 5.2% 8%);
-    filter: blur(0.5px);
-    opacity: 0.95;
-    z-index: -2;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -3;
   }
 
   /* ── grid floor gliding toward the viewer ── */
@@ -74,7 +64,7 @@
     left: -25vw;
     right: -25vw;
     bottom: 0;
-    height: 42vh;
+    height: 38vh;
     background-image:
       linear-gradient(to top, rgba(20,16,25,0) 0%, rgba(20,16,25,0.85) 96%),
       repeating-linear-gradient(90deg, var(--cathode-cyan) 0 2px, transparent 2px 72px),
@@ -82,7 +72,7 @@
     transform: perspective(420px) rotateX(62deg);
     transform-origin: 50% 100%;
     animation: glide 3.2s linear infinite;
-    opacity: 0.55;
+    opacity: 0.5;
     z-index: -1;
   }
   @keyframes glide { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 0 0, 0 0, 0 46px; } }
@@ -92,7 +82,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 22px;
+    gap: 20px;
     padding: 24px;
     z-index: 1;
   }
@@ -108,7 +98,7 @@
 
   .frame {
     position: relative;
-    padding: 18px;
+    padding: 16px;
     background: linear-gradient(150deg, #241c17, #17120e);
     border: 2px solid var(--amber-deep);
     border-radius: 14px;
@@ -123,31 +113,29 @@
     0%, 100% { box-shadow: 0 0 0 4px rgba(26,20,16,0.9), 0 0 44px rgba(255,179,102,0.45), 0 0 120px rgba(77,217,217,0.25), inset 0 0 24px rgba(0,0,0,0.6); }
     50% { box-shadow: 0 0 0 4px rgba(26,20,16,0.9), 0 0 64px rgba(255,153,128,0.6), 0 0 150px rgba(127,191,95,0.35), inset 0 0 24px rgba(0,0,0,0.6); }
   }
-  .frame::after {   /* CRT scanlines over the code */
-    content: "";
-    position: absolute;
-    inset: 18px;
-    border-radius: 4px;
-    background: repeating-linear-gradient(180deg, rgba(0,0,0,0.06) 0 2px, transparent 2px 4px);
-    pointer-events: none;
-    mix-blend-mode: multiply;
-  }
-  canvas {
+  canvas#qr {
     display: block;
-    width: min(64vmin, 420px);
-    height: min(64vmin, 420px);
+    width: min(58vmin, 380px);
+    height: min(58vmin, 380px);
     image-rendering: pixelated;
     border-radius: 4px;
   }
 
   .tagline {
     color: var(--peach-haze);
-    font-size: clamp(10px, 2.2vw, 12.5px);
-    letter-spacing: 0.28em;
+    font-size: clamp(11px, 2.4vw, 13.5px);
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     text-align: center;
     text-shadow: 0 0 10px rgba(255,204,179,0.6);
-    line-height: 2.1;
+    line-height: 2.2;
+    background: rgba(20, 16, 25, 0.78);
+    border: 1px solid rgba(204, 136, 68, 0.55);
+    border-radius: 12px;
+    padding: 14px 26px 16px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 0 30px rgba(20, 16, 25, 0.55);
   }
   .tagline .name {
     display: block;
@@ -174,30 +162,14 @@
   }
   .tagline .sep { color: var(--amber-glow); }
 
-  /* ambient particles drifting upward — tiny hopeful sparks */
-  .spark {
-    position: fixed;
-    bottom: -8px;
-    width: 3px; height: 3px;
-    border-radius: 50%;
-    animation: rise linear infinite;
-    z-index: 0;
-  }
-  @keyframes rise {
-    from { transform: translateY(0); opacity: 0; }
-    12% { opacity: 0.9; }
-    to { transform: translateY(-105vh); opacity: 0; }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .floor, .frame { animation: none; }
-    .spark { display: none; }
   }
 </style>
 </head>
 <body>
   <div class="sky"></div>
-  <div class="sun"></div>
+  <canvas id="chaos"></canvas>
   <div class="floor"></div>
 
   <main class="stage">
@@ -215,132 +187,166 @@
 
 <script>
 (function () {
-  // 37×37 QR, ECC level H → https://j-east.github.io/iframe-portfolio/
+  // ── the QR itself: plain, solid, maximally scannable ──────────
+  // 37×37, ECC level H → https://j-east.github.io/iframe-portfolio/
   const ROWS = ["1111111010001110000100000000101111111","1000001011001100110100000001001000001","1011101011110110101101010011101011101","1011101001110101100111100111001011101","1011101001001010011001011100001011101","1000001010110100111000010111101000001","1111111010101010101010101010101111111","0000000010100100110101100010100000000","0011101011101111010100001100011100111","1010000001010001100111111100100100100","1110101010101000100101011111101010111","0011100010001111001001000011001100000","0100011111110010100010001110011010110","1011010000010100101110101100110101100","1101111011011110101100110001010111011","1000000001001011100011001000000110011","1100011110001010100101100111111010111","0111000010000010100000001110100001000","0111001000001000101111111011100000011","0110000010100101001010110011011100000","0001111010001001101001110110011110100","0001110101111101010100000100000101100","0011001000010010100011010111010000011","0110100100011100000110100010010100001","1000001000011000000000010000011011101","1110100001111011001100101100100101000","1001001010111110110101100101001001101","1000010011011011111100001001110100000","1010101110001000011111100100111110101","0000000011001001010111110000100010000","1111111000101101011111000010101011011","1000001000100011000010000010100010011","1011101011110001011111011111111110110","1011101010100101001011000001101011000","1011101011001001101000111010010000101","1000001000010000010110110011111110001","1111111001110111100000011100010110111"];
-  const N = ROWS.length;
-  const QUIET = 3;                      // quiet-zone modules on each side
-  const TOTAL = N + QUIET * 2;
-
+  const N = ROWS.length, QUIET = 3, TOTAL = N + QUIET * 2;
   const canvas = document.getElementById("qr");
   const ctx = canvas.getContext("2d");
   const CELL = Math.floor(canvas.width / TOTAL);
   const PAD = Math.floor((canvas.width - CELL * TOTAL) / 2);
-  const DARK = "#17120C";
-
-  // The optimism palette — light cells only, so the code always scans.
-  const STOPS = [
-    [255, 210, 150],  // amber core
-    [255, 178, 156],  // salmon (lightened — keeps decode margin)
-    [242, 230, 217],  // cream
-    [150, 226, 182],  // mint glow
-    [128, 255, 170],  // terminal green (lightened)
-    [130, 230, 230],  // cathode cyan (lightened)
-    [246, 208, 182],  // peach sky
-  ];
-  const cx = TOTAL / 2, cy = TOTAL / 2;
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // ── organic life ──────────────────────────────────────────────
-  // A continuous-energy cellular automaton (Life with soft edges):
-  // each cell holds energy 0..1; a neighborhood sum near the Life
-  // sweet spot (~2–3 living neighbors) pulls energy up, anything
-  // else lets it decay. Colonies bloom, drift, and dissolve instead
-  // of blinking. It runs across the whole grid, but only light
-  // cells display it — the ink modules never change, so it scans.
-  const cells = new Float32Array(TOTAL * TOTAL);
-  const next = new Float32Array(TOTAL * TOTAL);
-  const idx = (x, y) => ((y + TOTAL) % TOTAL) * TOTAL + ((x + TOTAL) % TOTAL);
-
-  function seedBlob() {
-    const bx = Math.random() * TOTAL, by = Math.random() * TOTAL, r = 2 + Math.random() * 3;
-    for (let y = 0; y < TOTAL; y++) for (let x = 0; x < TOTAL; x++) {
-      const d = Math.hypot(x - bx, y - by);
-      if (d < r) cells[idx(x, y)] = Math.max(cells[idx(x, y)], 0.9 - d / r * 0.4 + Math.random() * 0.1);
-    }
-  }
-  for (let i = 0; i < 6; i++) seedBlob();
-
-  function stepLife() {
-    let total = 0;
-    for (let y = 0; y < TOTAL; y++) {
-      for (let x = 0; x < TOTAL; x++) {
-        const e = cells[idx(x, y)];
-        const s =
-          cells[idx(x-1,y-1)] + cells[idx(x,y-1)] + cells[idx(x+1,y-1)] +
-          cells[idx(x-1,y  )]                     + cells[idx(x+1,y  )] +
-          cells[idx(x-1,y+1)] + cells[idx(x,y+1)] + cells[idx(x+1,y+1)];
-        // soft Life: sweet spot ~2.6 living neighbors, gaussian falloff
-        const growth = Math.exp(-Math.pow((s - 2.6) / 1.05, 2));
-        let v = e + (growth - e) * 0.22;
-        v += (Math.random() - 0.5) * 0.012;          // metabolic noise
-        next[idx(x, y)] = Math.max(0, Math.min(1, v));
-        total += v;
-      }
-    }
-    cells.set(next);
-    if (total / (TOTAL * TOTAL) < 0.05) { seedBlob(); seedBlob(); seedBlob(); }
-  }
-
-  const CREAM = [242, 230, 217];
-  function draw(ms) {
-    const t = ms / 1000;
-    for (let y = 0; y < TOTAL; y++) {
-      for (let x = 0; x < TOTAL; x++) {
-        const qx = x - QUIET, qy = y - QUIET;
-        const dark = qx >= 0 && qy >= 0 && qx < N && qy < N && ROWS[qy][qx] === "1";
-        if (dark) {
-          ctx.fillStyle = DARK;
-        } else {
-          const e = cells[idx(x, y)];
-          const dx = x - cx, dy = y - cy;
-          const dist = Math.sqrt(dx * dx + dy * dy) / TOTAL;
-          // living cells glow through the palette; dormant cells rest at warm cream
-          const c = paletteRGB(e * 0.62 + t * 0.02 + dist * 0.22);
-          const k = Math.pow(e, 0.8) * 0.85;         // how far from cream toward the colony color — verified scannable; don't raise without re-decoding a screenshot
-          ctx.fillStyle = `rgb(${(CREAM[0]+(c[0]-CREAM[0])*k)|0},${(CREAM[1]+(c[1]-CREAM[1])*k)|0},${(CREAM[2]+(c[2]-CREAM[2])*k)|0})`;
-        }
-        ctx.fillRect(PAD + x * CELL, PAD + y * CELL, CELL, CELL);
-      }
-    }
-  }
-
-  function paletteRGB(t) {
-    t = ((t % 1) + 1) % 1;
-    const f = t * STOPS.length;
-    const i = Math.floor(f) % STOPS.length;
-    const j = (i + 1) % STOPS.length;
-    const k = f - Math.floor(f);
-    const a = STOPS[i], b = STOPS[j];
-    return [a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k];
-  }
-
-  if (reduced) {
-    for (let i = 0; i < 40; i++) stepLife();   // let colonies form, show one calm frame
-    draw(9000);
-  } else {
-    let lastStep = 0, lastDraw = 0;
-    (function loop(ms) {
-      if (ms - lastStep > 110) { stepLife(); lastStep = ms; }   // ~9 generations/s
-      if (ms - lastDraw > 66) { draw(ms); lastDraw = ms; }      // ~15fps render
-      requestAnimationFrame(loop);
-    })(0);
-  }
-
-  // hopeful sparks
-  if (!reduced) {
-    const colors = ["#FFB366", "#4DD9D9", "#7FBF5F", "#FF9980", "#F2E6D9"];
-    for (let i = 0; i < 26; i++) {
-      const s = document.createElement("div");
-      s.className = "spark";
-      s.style.left = (Math.random() * 100) + "vw";
-      s.style.background = colors[i % colors.length];
-      s.style.boxShadow = `0 0 6px ${colors[i % colors.length]}`;
-      s.style.animationDuration = (7 + Math.random() * 9) + "s";
-      s.style.animationDelay = (-Math.random() * 16) + "s";
-      document.body.appendChild(s);
-    }
-  }
+  ctx.fillStyle = "#F2E6D9";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#17120C";
+  for (let y = 0; y < N; y++)
+    for (let x = 0; x < N; x++)
+      if (ROWS[y][x] === "1")
+        ctx.fillRect(PAD + (x + QUIET) * CELL, PAD + (y + QUIET) * CELL, CELL, CELL);
 })();
+</script>
+
+<script type="module">
+// ── chaos: a morphing Clifford attractor (lineage: j-east/ChaosRenders) ──
+// x' = sin(a·y) + c·cos(a·x)
+// y' = sin(b·x) + d·cos(b·y)
+// The constants drift between curated parameter sets — the same trick
+// ChaosRenders played with its newa/newb shift — so the form never
+// settles. 90k particles ride the map on the GPU via three.js Points.
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canvas = document.getElementById("chaos");
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+} catch (e) { canvas.remove(); throw e; }   // no WebGL → dawn sky stands alone
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+camera.position.z = 2;
+
+const COUNT = reduced ? 45000 : 90000;
+const positions = new Float32Array(COUNT * 3);
+const colors = new Float32Array(COUNT * 3);
+const px = new Float32Array(COUNT);
+const py = new Float32Array(COUNT);
+for (let i = 0; i < COUNT; i++) { px[i] = Math.random() * 4 - 2; py[i] = Math.random() * 4 - 2; }
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+const material = new THREE.PointsMaterial({
+  size: 1.4 * Math.min(devicePixelRatio, 2),
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.42,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  sizeAttenuation: false,
+});
+scene.add(new THREE.Points(geometry, material));
+
+// palette (the site's own) as vec3s
+const PALETTE = [
+  [1.0, 0.70, 0.40],   // amber glow
+  [1.0, 0.60, 0.50],   // salmon
+  [0.50, 0.85, 0.85],  // cathode cyan
+  [0.50, 1.0, 0.53],   // terminal green
+  [1.0, 0.80, 0.70],   // peach haze
+];
+function pal(t) {
+  t = ((t % 1) + 1) % 1;
+  const f = t * PALETTE.length;
+  const i = Math.floor(f) % PALETTE.length, j = (i + 1) % PALETTE.length, k = f - Math.floor(f);
+  return [
+    PALETTE[i][0] + (PALETTE[j][0] - PALETTE[i][0]) * k,
+    PALETTE[i][1] + (PALETTE[j][1] - PALETTE[i][1]) * k,
+    PALETTE[i][2] + (PALETTE[j][2] - PALETTE[i][2]) * k,
+  ];
+}
+
+// curated Clifford parameter cycle — ChaosRenders' own set leads.
+// Every consecutive transition was machine-checked to stay chaotic at
+// 25/50/75% parameter blends (spread > 0.55), so the morph never
+// collapses into a fixed point mid-flight.
+const SETS = [
+  [-1.7, 1.8, -0.9, -0.4],
+  [-1.4, 1.6, 1.0, 0.7],
+  [-1.7, 1.3, -0.1, -1.2],
+  [-1.8, 1.9, -0.7, -0.5],
+  [-2.0, -2.0, -1.2, 2.0],
+];
+let setIdx = 0;
+let cur = SETS[0].slice();
+let target = SETS[1].slice();
+let morph = 0;
+const MORPH_SECONDS = 14;
+
+let viewAspect = 1;
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  viewAspect = w / h;
+  camera.left = -viewAspect; camera.right = viewAspect;
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize);
+resize();
+
+const clock = new THREE.Clock();
+let hue = 0;
+
+function stepParticles(a, b, c, d, t) {
+  for (let i = 0; i < COUNT; i++) {
+    let x = px[i], y = py[i];
+    // safety net: a trickle of respawns keeps transitional regimes
+    // luminous instead of letting everything pool into one point
+    if (Math.random() < 0.004) { x = Math.random() * 4 - 2; y = Math.random() * 4 - 2; }
+    const nx = Math.sin(a * y) + c * Math.cos(a * x) + (Math.random() - 0.5) * 0.004;
+    const ny = Math.sin(b * x) + d * Math.cos(b * y) + (Math.random() - 0.5) * 0.004;
+    px[i] = nx; py[i] = ny;
+    const o = i * 3;
+    // sweep the whole sky — the QR panel floats inside the chaos,
+    // filaments spilling out on every side
+    positions[o] = nx * viewAspect * 0.62;
+    positions[o + 1] = ny * 0.62;
+    positions[o + 2] = 0;
+    // color by where the particle sits on the form + slow global drift
+    const col = pal(Math.atan2(ny, nx) / (Math.PI * 2) + hue);
+    colors[o] = col[0]; colors[o + 1] = col[1]; colors[o + 2] = col[2];
+  }
+  geometry.attributes.position.needsUpdate = true;
+  geometry.attributes.color.needsUpdate = true;
+}
+
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.1);
+  hue += dt * 0.012;
+  morph += dt / MORPH_SECONDS;
+  if (morph >= 1) {
+    morph = 0;
+    setIdx = (setIdx + 1) % SETS.length;
+    cur = target;
+    target = SETS[(setIdx + 1) % SETS.length].slice();
+  }
+  // smoothstep between parameter sets — forms melt into one another
+  const s = morph * morph * (3 - 2 * morph);
+  const a = cur[0] + (target[0] - cur[0]) * s;
+  const b = cur[1] + (target[1] - cur[1]) * s;
+  const c = cur[2] + (target[2] - cur[2]) * s;
+  const d = cur[3] + (target[3] - cur[3]) * s;
+  stepParticles(a, b, c, d);
+  renderer.render(scene, camera);
+}
+
+if (reduced) {
+  // settle onto ChaosRenders' home form and hold it
+  for (let k = 0; k < 20; k++) stepParticles(...SETS[0]);
+  renderer.render(scene, camera);
+} else {
+  renderer.setAnimationLoop(frame);
+}
 </script>
 </body>
 </html>
