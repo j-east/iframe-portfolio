@@ -210,6 +210,77 @@
   }
   #about a:hover { color: var(--terminal-green); }
 
+  .toggles { display: flex; gap: 18px; }
+  #tune-toggle {
+    background: none;
+    border: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber-glow);
+    text-shadow: 0 0 8px rgba(255,179,102,0.6);
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: color 0.25s ease;
+  }
+  #tune-toggle:hover, #tune-toggle:focus-visible { color: var(--amber-core); }
+  #tune {
+    max-width: min(420px, 88vw);
+    background: rgba(20, 16, 25, 0.82);
+    border: 1px solid rgba(255, 179, 102, 0.4);
+    border-radius: 12px;
+    padding: 14px 20px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #tune label {
+    display: grid;
+    grid-template-columns: 120px 1fr 44px;
+    align-items: center;
+    gap: 12px;
+    color: var(--cream);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  #tune span { color: var(--cathode-cyan); text-align: right; font-size: 11px; }
+  #tune input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 3px;
+    background: rgba(242, 230, 217, 0.25);
+    border-radius: 2px;
+    outline: none;
+  }
+  #tune input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--amber-glow);
+    box-shadow: 0 0 8px rgba(255,179,102,0.8);
+    cursor: pointer;
+  }
+  #tune input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--cream); }
+  #t-reset {
+    align-self: flex-end;
+    background: none;
+    border: 1px solid rgba(255,179,102,0.5);
+    border-radius: 6px;
+    color: var(--amber-glow);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  #t-reset:hover { color: var(--amber-core); border-color: var(--amber-core); }
+
   @media (prefers-reduced-motion: reduce) {
     .floor, .frame { animation: none; }
   }
@@ -231,7 +302,18 @@
       <a href="mailto:jevans@paladinrecruiter.com">jevans@paladinrecruiter.com</a><br>
       <a href="https://j-east.github.io/iframe-portfolio/">j-east.github.io/iframe-portfolio</a>
     </div>
-    <button type="button" id="about-toggle" aria-expanded="false" aria-controls="about">◦ what is this sky? ◦</button>
+    <div class="toggles">
+      <button type="button" id="about-toggle" aria-expanded="false" aria-controls="about">◦ what is this sky? ◦</button>
+      <button type="button" id="tune-toggle" aria-expanded="false" aria-controls="tune">◦ tune ◦</button>
+    </div>
+    <div id="tune" hidden>
+      <label>neighbor radius <input type="range" id="t-radius" min="0.008" max="0.05" step="0.001" value="0.015"><span id="v-radius">0.015</span></label>
+      <label>min neighbors <input type="range" id="t-minn" min="0" max="8" step="1" value="1"><span id="v-minn">1</span></label>
+      <label>bloom <input type="range" id="t-bloom" min="0" max="1" step="0.02" value="0.32"><span id="v-bloom">0.32</span></label>
+      <label>point size <input type="range" id="t-size" min="0.5" max="3" step="0.1" value="1.0"><span id="v-size">1.0</span></label>
+      <label>morph speed <input type="range" id="t-speed" min="0.25" max="2" step="0.05" value="1.0"><span id="v-speed">1.0</span></label>
+      <button type="button" id="t-reset">reset</button>
+    </div>
     <div id="about" hidden>
       The sky is a <b>Clifford attractor</b> — a strange attractor from chaos theory,
       named for Clifford Pickover, who popularized these iterated-map forms in his
@@ -277,14 +359,27 @@
 })();
 </script>
 
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+} }
+</script>
 <script type="module">
 // ── chaos: a morphing Clifford attractor (lineage: j-east/ChaosRenders) ──
 // x' = sin(a·y) + c·cos(a·x)
 // y' = sin(b·x) + d·cos(b·y)
 // The constants drift between curated parameter sets — the same trick
 // ChaosRenders played with its newa/newb shift — so the form never
-// settles. 90k particles ride the map on the GPU via three.js Points.
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+// settles. Particles ride the map, then an UnrealBloom pass softens
+// stray points into faint haze and fuses dense filaments into glowing
+// strands — the "denoise" that makes it read as light, not pixels.
+// Bloom outputs an opaque buffer, so the dawn gradient lives inside
+// the scene as a backdrop (the CSS sky remains the no-WebGL fallback).
+import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canvas = document.getElementById("chaos");
@@ -292,11 +387,35 @@ let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
 } catch (e) { canvas.remove(); throw e; }   // no WebGL → dawn sky stands alone
-renderer.setPixelRatio(Math.min(devicePixelRatio, 3));
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));   // bloom pass — cap for perf; it softens anyway
 
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
 camera.position.z = 2;
+
+// in-scene dawn gradient (mirrors the CSS .sky fallback)
+const skyCanvas = document.createElement("canvas");
+skyCanvas.width = 2; skyCanvas.height = 512;
+const sctx = skyCanvas.getContext("2d");
+const grad = sctx.createLinearGradient(0, 0, 0, 512);
+grad.addColorStop(0.00, "#141019");
+grad.addColorStop(0.30, "#251b2e");
+grad.addColorStop(0.52, "#4d3048");
+grad.addColorStop(0.66, "#a05248");
+grad.addColorStop(0.74, "#FF9980");
+grad.addColorStop(0.80, "#FFCCB3");
+grad.addColorStop(0.86, "#FFCC88");
+grad.addColorStop(1.00, "#FFCC88");
+sctx.fillStyle = grad;
+sctx.fillRect(0, 0, 2, 512);
+const skyTexture = new THREE.CanvasTexture(skyCanvas);
+skyTexture.colorSpace = THREE.SRGBColorSpace;
+const skyMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(2, 2),
+  new THREE.MeshBasicMaterial({ map: skyTexture })
+);
+skyMesh.position.z = -1;
+scene.add(skyMesh);
 
 const MOBILE = matchMedia("(pointer: coarse)").matches;
 const COUNT = reduced ? 60000 : MOBILE ? 90000 : 160000;
@@ -354,15 +473,40 @@ let setIdx = 0;
 let cur = SETS[0].slice();
 let target = SETS[1].slice();
 let morph = 0;
-const MORPH_SECONDS = 20;
+const MORPH_BASE = 20;
+
+// ── tunables (John's dials) ───────────────────────────────────
+const DEFAULTS = { radius: 0.015, minn: 1, bloomStrength: 0.32, size: 1.0, speed: 1.0 };
+let tune = { ...DEFAULTS };
+try { tune = { ...DEFAULTS, ...JSON.parse(localStorage.getItem("chaos-tune") || "{}") }; } catch (e) {}
+
+// spatial hash for the isolated-dot filter: a particle only shines if
+// its 3×3 grid neighborhood holds at least minn other particles.
+// Culling is free under additive blending — a black particle adds nothing.
+const SPAN = 2.4;                       // attractor coords live in ±(1+|c or d|) ≈ ±2.2
+let gridN = 0, counts = null, cellOf = null;
+function rebuildGrid() {
+  gridN = Math.min(512, Math.max(64, Math.round((SPAN * 2) / tune.radius)));
+  counts = new Uint16Array(gridN * gridN);
+  cellOf = new Int32Array(COUNT);
+}
+rebuildGrid();
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+// threshold 0.9: only near-white filament cores bloom — the sky stays a sky
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.32, 0.5, 0.9);
+composer.addPass(bloom);
 
 let viewAspect = 1;
 function resize() {
   const w = innerWidth, h = innerHeight;
   renderer.setSize(w, h, false);
+  composer.setSize(w, h);
   viewAspect = w / h;
   camera.left = -viewAspect; camera.right = viewAspect;
   camera.updateProjectionMatrix();
+  skyMesh.scale.set(viewAspect * 2.05, 2.05, 1);
 }
 addEventListener("resize", resize);
 resize();
@@ -370,7 +514,10 @@ resize();
 const clock = new THREE.Clock();
 let hue = 0;
 
-function stepParticles(a, b, c, d, t) {
+function stepParticles(a, b, c, d) {
+  // pass 1: advance the map, fill the density grid
+  counts.fill(0);
+  const inv = gridN / (SPAN * 2);
   for (let i = 0; i < COUNT; i++) {
     let x = px[i], y = py[i];
     // safety net: a trickle of respawns keeps transitional regimes
@@ -379,15 +526,48 @@ function stepParticles(a, b, c, d, t) {
     const nx = Math.sin(a * y) + c * Math.cos(a * x) + (Math.random() - 0.5) * 0.004;
     const ny = Math.sin(b * x) + d * Math.cos(b * y) + (Math.random() - 0.5) * 0.004;
     px[i] = nx; py[i] = ny;
+    const gx = Math.min(gridN - 1, Math.max(0, ((nx + SPAN) * inv) | 0));
+    const gy = Math.min(gridN - 1, Math.max(0, ((ny + SPAN) * inv) | 0));
+    const cell = gy * gridN + gx;
+    cellOf[i] = cell;
+    counts[cell]++;
+  }
+  // pass 2: place + color; isolated particles go black (invisible under additive)
+  const minCount = tune.minn + 1;   // + self
+  for (let i = 0; i < COUNT; i++) {
     const o = i * 3;
+    const nx = px[i], ny = py[i];
     // sweep the whole sky — the QR panel floats inside the chaos,
     // filaments spilling out on every side
     positions[o] = nx * viewAspect * 0.62;
     positions[o + 1] = ny * 0.62;
     positions[o + 2] = 0;
-    // color by where the particle sits on the form + slow global drift
-    const col = pal(Math.atan2(ny, nx) / (Math.PI * 2) + hue);
-    colors[o] = col[0]; colors[o + 1] = col[1]; colors[o + 2] = col[2];
+    let visible = true;
+    if (tune.minn > 0) {
+      const cell = cellOf[i];
+      const gx = cell % gridN, gy = (cell / gridN) | 0;
+      let sum = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        const yy = gy + dy;
+        if (yy < 0 || yy >= gridN) continue;
+        const row = yy * gridN;
+        for (let dx = -1; dx <= 1; dx++) {
+          const xx = gx + dx;
+          if (xx < 0 || xx >= gridN) continue;
+          sum += counts[row + xx];
+          if (sum >= minCount) break;
+        }
+        if (sum >= minCount) break;
+      }
+      visible = sum >= minCount;
+    }
+    if (visible) {
+      // color by where the particle sits on the form + slow global drift
+      const col = pal(Math.atan2(ny, nx) / (Math.PI * 2) + hue);
+      colors[o] = col[0]; colors[o + 1] = col[1]; colors[o + 2] = col[2];
+    } else {
+      colors[o] = 0; colors[o + 1] = 0; colors[o + 2] = 0;
+    }
   }
   geometry.attributes.position.needsUpdate = true;
   geometry.attributes.color.needsUpdate = true;
@@ -395,8 +575,8 @@ function stepParticles(a, b, c, d, t) {
 
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.1);
-  hue += dt * 0.028;   // the ChaosRenders color-shift mode, finally implemented — gentle, ~35s per full palette cycle
-  morph += dt / MORPH_SECONDS;
+  hue += dt * 0.028 * tune.speed;   // the ChaosRenders color-shift mode — gentle, ~35s per full palette cycle
+  morph += (dt * tune.speed) / MORPH_BASE;
   if (morph >= 1) {
     morph = 0;
     setIdx = (setIdx + 1) % SETS.length;
@@ -410,13 +590,53 @@ function frame() {
   const c = cur[2] + (target[2] - cur[2]) * s;
   const d = cur[3] + (target[3] - cur[3]) * s;
   stepParticles(a, b, c, d);
-  renderer.render(scene, camera);
+  composer.render();
 }
+
+// ── wire the dials ────────────────────────────────────────────
+function applyTune() {
+  bloom.strength = tune.bloomStrength;
+  material.size = tune.size * Math.min(devicePixelRatio, 2);
+  document.getElementById("v-radius").textContent = tune.radius.toFixed(3);
+  document.getElementById("v-minn").textContent = tune.minn;
+  document.getElementById("v-bloom").textContent = tune.bloomStrength.toFixed(2);
+  document.getElementById("v-size").textContent = tune.size.toFixed(1);
+  document.getElementById("v-speed").textContent = tune.speed.toFixed(2);
+  document.getElementById("t-radius").value = tune.radius;
+  document.getElementById("t-minn").value = tune.minn;
+  document.getElementById("t-bloom").value = tune.bloomStrength;
+  document.getElementById("t-size").value = tune.size;
+  document.getElementById("t-speed").value = tune.speed;
+  localStorage.setItem("chaos-tune", JSON.stringify(tune));
+  if (reduced) composer.render();
+}
+function bind(id, key, isInt, needsGrid) {
+  document.getElementById(id).addEventListener("input", (e) => {
+    tune[key] = isInt ? parseInt(e.target.value, 10) : parseFloat(e.target.value);
+    if (needsGrid) rebuildGrid();
+    applyTune();
+  });
+}
+bind("t-radius", "radius", false, true);
+bind("t-minn", "minn", true, false);
+bind("t-bloom", "bloomStrength", false, false);
+bind("t-size", "size", false, false);
+bind("t-speed", "speed", false, false);
+document.getElementById("t-reset").addEventListener("click", () => { tune = { ...DEFAULTS }; rebuildGrid(); applyTune(); });
+const tuneToggle = document.getElementById("tune-toggle");
+const tunePanel = document.getElementById("tune");
+tuneToggle.addEventListener("click", () => {
+  const open = tunePanel.hidden;
+  tunePanel.hidden = !open;
+  tuneToggle.setAttribute("aria-expanded", String(open));
+  tuneToggle.textContent = open ? "◦ done ◦" : "◦ tune ◦";
+});
+applyTune();
 
 if (reduced) {
   // settle onto ChaosRenders' home form and hold it
   for (let k = 0; k < 20; k++) stepParticles(...SETS[0]);
-  renderer.render(scene, camera);
+  composer.render();
 } else {
   renderer.setAnimationLoop(frame);
 }
