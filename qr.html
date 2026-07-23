@@ -312,6 +312,7 @@
       <label>bloom <input type="range" id="t-bloom" min="0" max="1" step="0.02" value="0.32"><span id="v-bloom">0.32</span></label>
       <label>point size <input type="range" id="t-size" min="0.5" max="3" step="0.1" value="1.0"><span id="v-size">1.0</span></label>
       <label>morph speed <input type="range" id="t-speed" min="0.25" max="2" step="0.05" value="1.0"><span id="v-speed">1.0</span></label>
+      <label>bloom trail <input type="range" id="t-trail" min="1" max="12" step="1" value="4"><span id="v-trail">4</span></label>
       <button type="button" id="t-reset">reset</button>
     </div>
     <div id="about" hidden>
@@ -371,15 +372,13 @@
 // y' = sin(b·x) + d·cos(b·y)
 // The constants drift between curated parameter sets — the same trick
 // ChaosRenders played with its newa/newb shift — so the form never
-// settles. Particles ride the map, then an UnrealBloom pass softens
-// stray points into faint haze and fuses dense filaments into glowing
-// strands — the "denoise" that makes it read as light, not pixels.
-// Bloom outputs an opaque buffer, so the dawn gradient lives inside
-// the scene as a backdrop (the CSS sky remains the no-WebGL fallback).
+// settles. Two denoisers keep it reading as light, not pixels: a
+// spatial-hash density filter hides isolated dots (tune panel), and a
+// temporally-smoothed bloom — an EMA history buffer feeds the glow
+// chain, so bloom breathes across ~trail frames instead of strobing,
+// and moving cores leave decaying tracers. The dawn gradient lives
+// inside the scene (the CSS sky remains the no-WebGL fallback).
 import * as THREE from "three";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canvas = document.getElementById("chaos");
@@ -476,7 +475,7 @@ let morph = 0;
 const MORPH_BASE = 20;
 
 // ── tunables (John's dials) ───────────────────────────────────
-const DEFAULTS = { radius: 0.015, minn: 1, bloomStrength: 0.32, size: 1.0, speed: 1.0 };
+const DEFAULTS = { radius: 0.015, minn: 1, bloomStrength: 0.32, size: 1.0, speed: 1.0, trail: 4 };
 let tune = { ...DEFAULTS };
 try { tune = { ...DEFAULTS, ...JSON.parse(localStorage.getItem("chaos-tune") || "{}") }; } catch (e) {}
 
@@ -492,21 +491,95 @@ function rebuildGrid() {
 }
 rebuildGrid();
 
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-// threshold 0.9: only near-white filament cores bloom — the sky stays a sky
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.32, 0.5, 0.9);
-composer.addPass(bloom);
+// ── post pipeline: temporally-smoothed bloom ──────────────────
+// The base render stays crisp. An exponential moving average of the
+// scene (ping-ponged history buffer) feeds the bloom chain instead of
+// the live frame — bloom breathes across ~trail frames instead of
+// strobing, and moving cores leave decaying tracers in the glow.
+const quadScene = new THREE.Scene();
+const quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const quadMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+quadScene.add(quadMesh);
+function drawPass(mat, target, additive) {
+  quadMesh.material = mat;
+  renderer.setRenderTarget(target);
+  if (additive) renderer.autoClear = false;
+  renderer.render(quadScene, quadCam);
+  renderer.autoClear = true;
+}
+const mkRT = (w, h) => new THREE.WebGLRenderTarget(Math.max(2, w), Math.max(2, h), { depthBuffer: false });
+let rtScene, rtHistA, rtHistB, rtBright, rtBlurA, rtBlurB;
+const VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
+const emaMat = new THREE.ShaderMaterial({
+  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 } },
+  vertexShader: VS,
+  fragmentShader: "uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; varying vec2 vUv; void main(){ gl_FragColor = mix(texture2D(tPrev, vUv), texture2D(tCur, vUv), k); }",
+});
+const brightMat = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: null }, threshold: { value: 0.85 } },
+  vertexShader: VS,
+  fragmentShader: "uniform sampler2D tex; uniform float threshold; varying vec2 vUv; void main(){ vec4 c = texture2D(tex, vUv); float lum = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722)); gl_FragColor = vec4(c.rgb * smoothstep(threshold, 1.0, lum), 1.0); }",
+});
+const blurMat = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: null }, dir: { value: new THREE.Vector2(1, 0) }, texel: { value: new THREE.Vector2() } },
+  vertexShader: VS,
+  fragmentShader: "uniform sampler2D tex; uniform vec2 dir; uniform vec2 texel; varying vec2 vUv; void main(){ float w0 = 0.227027; float w1 = 0.194594; float w2 = 0.121621; float w3 = 0.054054; float w4 = 0.016216; vec3 s = texture2D(tex, vUv).rgb * w0; vec2 o1 = dir * texel * 1.6; vec2 o2 = dir * texel * 3.2; vec2 o3 = dir * texel * 4.8; vec2 o4 = dir * texel * 6.4; s += (texture2D(tex, vUv + o1).rgb + texture2D(tex, vUv - o1).rgb) * w1; s += (texture2D(tex, vUv + o2).rgb + texture2D(tex, vUv - o2).rgb) * w2; s += (texture2D(tex, vUv + o3).rgb + texture2D(tex, vUv - o3).rgb) * w3; s += (texture2D(tex, vUv + o4).rgb + texture2D(tex, vUv - o4).rgb) * w4; gl_FragColor = vec4(s, 1.0); }",
+});
+const copyMat = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: null } },
+  vertexShader: VS,
+  fragmentShader: "uniform sampler2D tex; varying vec2 vUv; void main(){ gl_FragColor = texture2D(tex, vUv); }",
+});
+const addMat = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: null }, strength: { value: 0.32 } },
+  vertexShader: VS,
+  fragmentShader: "uniform sampler2D tex; uniform float strength; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(tex, vUv).rgb * strength, 1.0); }",
+  blending: THREE.AdditiveBlending,
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+});
 
 let viewAspect = 1;
 function resize() {
   const w = innerWidth, h = innerHeight;
   renderer.setSize(w, h, false);
-  composer.setSize(w, h);
   viewAspect = w / h;
   camera.left = -viewAspect; camera.right = viewAspect;
   camera.updateProjectionMatrix();
   skyMesh.scale.set(viewAspect * 2.05, 2.05, 1);
+  const dpr = renderer.getPixelRatio();
+  const W = Math.round(w * dpr), H = Math.round(h * dpr);
+  [rtScene, rtHistA, rtHistB, rtBright, rtBlurA, rtBlurB].forEach(rt => rt && rt.dispose());
+  rtScene = mkRT(W, H);
+  rtHistA = mkRT(W >> 1, H >> 1);
+  rtHistB = mkRT(W >> 1, H >> 1);
+  rtBright = mkRT(W >> 2, H >> 2);
+  rtBlurA = mkRT(W >> 2, H >> 2);
+  rtBlurB = mkRT(W >> 2, H >> 2);
+  blurMat.uniforms.texel.value.set(1 / (W >> 2), 1 / (H >> 2));
+}
+
+function renderFrame() {
+  renderer.setRenderTarget(rtScene);
+  renderer.render(scene, camera);
+  // EMA into the history buffer (ping-pong); k = 1/trail
+  emaMat.uniforms.tPrev.value = rtHistA.texture;
+  emaMat.uniforms.tCur.value = rtScene.texture;
+  emaMat.uniforms.k.value = 1 / tune.trail;
+  drawPass(emaMat, rtHistB);
+  const swap = rtHistA; rtHistA = rtHistB; rtHistB = swap;   // A holds newest
+  // bloom chain fed by the smoothed history, not the live frame
+  brightMat.uniforms.tex.value = rtHistA.texture;
+  drawPass(brightMat, rtBright);
+  blurMat.uniforms.tex.value = rtBright.texture; blurMat.uniforms.dir.value.set(1, 0); drawPass(blurMat, rtBlurA);
+  blurMat.uniforms.tex.value = rtBlurA.texture; blurMat.uniforms.dir.value.set(0, 1); drawPass(blurMat, rtBlurB);
+  // composite: crisp base + smoothed glow
+  copyMat.uniforms.tex.value = rtScene.texture;
+  drawPass(copyMat, null);
+  addMat.uniforms.tex.value = rtBlurB.texture;
+  addMat.uniforms.strength.value = tune.bloomStrength * 1.7;
+  drawPass(addMat, null, true);
 }
 addEventListener("resize", resize);
 resize();
@@ -590,13 +663,14 @@ function frame() {
   const c = cur[2] + (target[2] - cur[2]) * s;
   const d = cur[3] + (target[3] - cur[3]) * s;
   stepParticles(a, b, c, d);
-  composer.render();
+  renderFrame();
 }
 
 // ── wire the dials ────────────────────────────────────────────
 function applyTune() {
-  bloom.strength = tune.bloomStrength;
   material.size = tune.size * Math.min(devicePixelRatio, 2);
+  document.getElementById("v-trail").textContent = tune.trail;
+  document.getElementById("t-trail").value = tune.trail;
   document.getElementById("v-radius").textContent = tune.radius.toFixed(3);
   document.getElementById("v-minn").textContent = tune.minn;
   document.getElementById("v-bloom").textContent = tune.bloomStrength.toFixed(2);
@@ -608,7 +682,7 @@ function applyTune() {
   document.getElementById("t-size").value = tune.size;
   document.getElementById("t-speed").value = tune.speed;
   localStorage.setItem("chaos-tune", JSON.stringify(tune));
-  if (reduced) composer.render();
+  if (reduced) renderFrame();
 }
 function bind(id, key, isInt, needsGrid) {
   document.getElementById(id).addEventListener("input", (e) => {
@@ -622,6 +696,7 @@ bind("t-minn", "minn", true, false);
 bind("t-bloom", "bloomStrength", false, false);
 bind("t-size", "size", false, false);
 bind("t-speed", "speed", false, false);
+bind("t-trail", "trail", true, false);
 document.getElementById("t-reset").addEventListener("click", () => { tune = { ...DEFAULTS }; rebuildGrid(); applyTune(); });
 const tuneToggle = document.getElementById("tune-toggle");
 const tunePanel = document.getElementById("tune");
@@ -636,7 +711,7 @@ applyTune();
 if (reduced) {
   // settle onto ChaosRenders' home form and hold it
   for (let k = 0; k < 20; k++) stepParticles(...SETS[0]);
-  composer.render();
+  renderFrame();
 } else {
   renderer.setAnimationLoop(frame);
 }
