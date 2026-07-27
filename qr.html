@@ -297,6 +297,7 @@
       <label>bloom trail <input type="range" id="t-trail" min="1" max="40" step="1" value="8"><span id="v-trail">8</span></label>
       <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.15" step="0.005" value="0.035"><span id="v-huesh">0.035</span></label>
       <label>trail chroma <input type="range" id="t-chroma" min="0.9" max="1.3" step="0.01" value="1.05"><span id="v-chroma">1.05</span></label>
+      <label>trail decay <input type="range" id="t-decay" min="0.80" max="1.0" step="0.005" value="0.96"><span id="v-decay">0.960</span></label>
       <label>morph pacing <input type="range" id="t-pace" min="0" max="2" step="0.05" value="1.0"><span id="v-pace">1.00</span></label>
       <button type="button" id="t-reset">reset</button>
     </div>
@@ -487,7 +488,7 @@ const MORPH_BASE = 20;
 
 // ── tunables (John's dials) ───────────────────────────────────
 // defaults dialed in by John, 2026-07-24
-const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.035, trailChroma: 1.05, pacing: 1.0 };
+const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.035, trailChroma: 1.05, pacing: 1.0, trailDecay: 0.96 };
 let tune = { ...DEFAULTS };
 try { tune = { ...DEFAULTS, ...JSON.parse(localStorage.getItem("chaos-tune") || "{}") }; } catch (e) {}
 
@@ -531,10 +532,10 @@ const VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position
 // old ones while the OLD frames hue-shift — trails change color as
 // they age instead of merely fading
 const emaMat = new THREE.ShaderMaterial({
-  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 }, hueShift: { value: 0.015 }, chromaGain: { value: 1.05 } },
+  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 }, hueShift: { value: 0.015 }, chromaGain: { value: 1.05 }, decay: { value: 0.96 } },
   vertexShader: VS,
   fragmentShader: `
-    uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; uniform float hueShift; uniform float chromaGain; varying vec2 vUv;
+    uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; uniform float hueShift; uniform float chromaGain; uniform float decay; varying vec2 vUv;
     vec3 hueRotate(vec3 c, float a, float gain) {
       const mat3 toYIQ = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312);
       const mat3 toRGB = mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703);
@@ -544,7 +545,9 @@ const emaMat = new THREE.ShaderMaterial({
       return max(toRGB * vec3(yiq.x, chroma * cos(h), chroma * sin(h)), 0.0);
     }
     void main() {
-      vec3 prev = hueRotate(texture2D(tPrev, vUv).rgb, hueShift, chromaGain);
+      // old light hue-shifts, then DIES exponentially — decay is what
+      // keeps the chroma gain from turning the screen into a wavepool
+      vec3 prev = hueRotate(texture2D(tPrev, vUv).rgb, hueShift, chromaGain) * decay;
       // new light enters GOLDEN; age alone carries it toward blue
       float lum = dot(texture2D(tCur, vUv).rgb, vec3(0.2126, 0.7152, 0.0722));
       vec3 golden = vec3(1.0, 0.78, 0.42) * lum * 1.2;
@@ -676,6 +679,7 @@ function renderFrame() {
   emaMat.uniforms.k.value = 1 / tune.trail;
   emaMat.uniforms.hueShift.value = -tune.trailHue;   // negative = the sunset direction: gold → pink → violet → blue
   emaMat.uniforms.chromaGain.value = tune.trailChroma;
+  emaMat.uniforms.decay.value = tune.trailDecay;
   drawPass(emaMat, rtHistB);
   const swap = rtHistA; rtHistA = rtHistB; rtHistB = swap;   // A holds newest
   // bloom chain fed by the smoothed history, not the live frame
@@ -877,6 +881,8 @@ function applyTune() {
   document.getElementById("t-huesh").value = tune.trailHue;
   document.getElementById("v-chroma").textContent = tune.trailChroma.toFixed(2);
   document.getElementById("t-chroma").value = tune.trailChroma;
+  document.getElementById("v-decay").textContent = tune.trailDecay.toFixed(3);
+  document.getElementById("t-decay").value = tune.trailDecay;
   document.getElementById("v-pace").textContent = tune.pacing.toFixed(2);
   document.getElementById("t-pace").value = tune.pacing;
   document.getElementById("v-radius").textContent = tune.radius.toFixed(3);
@@ -908,6 +914,7 @@ bind("t-speed", "speed", false, false);
 bind("t-trail", "trail", true, false);
 bind("t-huesh", "trailHue", false, false);
 bind("t-chroma", "trailChroma", false, false);
+bind("t-decay", "trailDecay", false, false);
 bind("t-pace", "pacing", false, false, rebuildWarp);
 document.getElementById("t-reset").addEventListener("click", () => { tune = { ...DEFAULTS }; rebuildGrid(); applyTune(); });
 const tuneToggle = document.getElementById("tune-toggle");
