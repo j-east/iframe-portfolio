@@ -147,7 +147,7 @@
   .tagline .sep { color: var(--amber-glow); }
 
   /* ── the plaque: what is this sky? ── */
-  #about-toggle {
+  #about-toggle, #why-toggle {
     background: none;
     border: 0;
     font-family: var(--mono);
@@ -160,7 +160,23 @@
     padding: 6px 10px;
     transition: color 0.25s ease;
   }
+  #why-toggle { color: var(--peach-haze); text-shadow: 0 0 8px rgba(255,204,179,0.6); }
   #about-toggle:hover, #about-toggle:focus-visible { color: var(--terminal-green); }
+  #why-toggle:hover, #why-toggle:focus-visible { color: var(--amber-core); }
+  #why {
+    max-width: min(560px, 88vw);
+    background: rgba(20, 16, 25, 0.82);
+    border: 1px solid rgba(255, 204, 179, 0.4);
+    border-radius: 12px;
+    padding: 16px 22px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: var(--cream);
+    font-size: 12.5px;
+    line-height: 1.85;
+    text-align: left;
+    letter-spacing: 0.02em;
+  }
   #about {
     max-width: min(560px, 88vw);
     background: rgba(20, 16, 25, 0.82);
@@ -276,6 +292,40 @@
     cursor: pointer;
   }
   #t-reset:hover { color: var(--amber-core); border-color: var(--amber-core); }
+  .tune-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--amber-glow);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+  #t-close {
+    background: none;
+    border: 0;
+    color: var(--amber-glow);
+    font-family: var(--mono);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  #t-close:hover, #t-close:focus-visible { color: var(--amber-core); }
+  @media (max-width: 600px) {
+    #tune {
+      left: 12px;
+      right: 12px;
+      width: auto;
+      max-height: 48vh;
+      padding: 10px 14px;
+      gap: 7px;
+    }
+    #tune label {
+      grid-template-columns: 92px 1fr 38px;
+      gap: 8px;
+      font-size: 9.5px;
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .frame { animation: none; }
@@ -299,6 +349,26 @@
     </div>
     <div class="toggles">
       <button type="button" id="about-toggle" aria-expanded="false" aria-controls="about">◦ what is this sky? ◦</button>
+      <button type="button" id="why-toggle" aria-expanded="false" aria-controls="why">◦ why chaos? ◦</button>
+    </div>
+    <div id="why" hidden>
+      Chaos is not noise. It is law so rich that its obedience looks like freedom.
+      Two small equations, followed perfectly — and no moment repeats, no path can be
+      foretold, and still every point falls onto something beautiful. I think God is a
+      poet, and this is His meter: the weather, the tide, a heartbeat, a life. We are
+      dust that follows rules, and cannot be predicted — held on an attractor we
+      cannot see.
+      <br><br>
+      We even trust our secrets to it. Encryption is the practice of hiding truth
+      inside numbers too wild to guess — our privacy is borrowed from the same
+      unpredictability that steers storms. And the minds we are building now, the AIs,
+      are cascades of simple rules producing thought no one authored line by line.
+      Emergence is the oldest trick in creation; we are only beginning to learn to
+      write with it.
+      <br><br>
+      This page is my small psalm to all of that: order underneath, wonder on top,
+      and a Presence in between that I can only point toward — the way these particles
+      point, forever, at a shape they never finish drawing.
     </div>
     <div id="about" hidden>
       The sky is a <b>Clifford attractor</b> — a strange attractor from chaos theory,
@@ -319,6 +389,7 @@
        never disturbs the layout -->
   <button type="button" id="tune-toggle" aria-expanded="false" aria-controls="tune">◦ tune ◦</button>
   <div id="tune" hidden>
+    <div class="tune-head"><span>tune the chaos</span><button type="button" id="t-close" aria-label="Close tuning panel">✕</button></div>
     <label>neighbor radius <input type="range" id="t-radius" min="0.004" max="0.05" step="0.001" value="0.008"><span id="v-radius">0.008</span></label>
     <label>min neighbors <input type="range" id="t-minn" min="0" max="8" step="1" value="3"><span id="v-minn">3</span></label>
     <label>bloom <input type="range" id="t-bloom" min="0" max="3.5" step="0.05" value="0.6"><span id="v-bloom">0.60</span></label>
@@ -352,15 +423,21 @@
       if (ROWS[y][x] === "1")
         ctx.fillRect(PAD + (x + QUIET) * CELL, PAD + (y + QUIET) * CELL, CELL, CELL);
 
-  // the plaque
-  const toggle = document.getElementById("about-toggle");
-  const about = document.getElementById("about");
-  toggle.addEventListener("click", () => {
-    const open = about.hidden;
-    about.hidden = !open;
-    toggle.setAttribute("aria-expanded", String(open));
-    toggle.textContent = open ? "◦ close ◦" : "◦ what is this sky? ◦";
-  });
+  // the plaques — opening one closes the other (small screens are precious)
+  const plaques = [
+    { btn: document.getElementById("about-toggle"), panel: document.getElementById("about"), label: "◦ what is this sky? ◦" },
+    { btn: document.getElementById("why-toggle"), panel: document.getElementById("why"), label: "◦ why chaos? ◦" },
+  ];
+  for (const p of plaques) {
+    p.btn.addEventListener("click", () => {
+      const open = p.panel.hidden;
+      for (const q of plaques) {
+        q.panel.hidden = !(q === p && open);
+        q.btn.setAttribute("aria-expanded", String(!q.panel.hidden));
+        q.btn.textContent = q.panel.hidden ? q.label : "◦ close ◦";
+      }
+    });
+  }
 })();
 </script>
 
@@ -953,11 +1030,16 @@ bind("t-vscale", "vscale", false, false);
 document.getElementById("t-reset").addEventListener("click", () => { tune = { ...DEFAULTS }; rebuildGrid(); applyTune(); });
 const tuneToggle = document.getElementById("tune-toggle");
 const tunePanel = document.getElementById("tune");
-tuneToggle.addEventListener("click", () => {
-  const open = tunePanel.hidden;
+function setTune(open) {
   tunePanel.hidden = !open;
   tuneToggle.setAttribute("aria-expanded", String(open));
   tuneToggle.textContent = open ? "◦ done ◦" : "◦ tune ◦";
+}
+tuneToggle.addEventListener("click", () => setTune(tunePanel.hidden));
+document.getElementById("t-close").addEventListener("click", () => setTune(false));
+// tap anywhere outside to dismiss — the controls get out of the way
+document.addEventListener("click", (e) => {
+  if (!tunePanel.hidden && !tunePanel.contains(e.target) && !tuneToggle.contains(e.target)) setTune(false);
 });
 applyTune();
 
