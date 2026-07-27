@@ -195,8 +195,13 @@
 
   .toggles { display: flex; gap: 18px; }
   #tune-toggle {
-    background: none;
-    border: 0;
+    position: fixed;
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    z-index: 30;
+    background: rgba(20, 16, 25, 0.7);
+    border: 1px solid rgba(255, 179, 102, 0.45);
+    border-radius: 8px;
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.22em;
@@ -204,13 +209,21 @@
     color: var(--amber-glow);
     text-shadow: 0 0 8px rgba(255,179,102,0.6);
     cursor: pointer;
-    padding: 6px 10px;
+    padding: 7px 12px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     transition: color 0.25s ease;
   }
   #tune-toggle:hover, #tune-toggle:focus-visible { color: var(--amber-core); }
   #tune {
-    max-width: min(420px, 88vw);
-    background: rgba(20, 16, 25, 0.82);
+    position: fixed;
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
+    z-index: 30;
+    width: min(400px, 88vw);
+    max-height: min(70vh, 560px);
+    overflow-y: auto;
+    background: rgba(20, 16, 25, 0.86);
     border: 1px solid rgba(255, 179, 102, 0.4);
     border-radius: 12px;
     padding: 14px 20px;
@@ -286,20 +299,6 @@
     </div>
     <div class="toggles">
       <button type="button" id="about-toggle" aria-expanded="false" aria-controls="about">◦ what is this sky? ◦</button>
-      <button type="button" id="tune-toggle" aria-expanded="false" aria-controls="tune">◦ tune ◦</button>
-    </div>
-    <div id="tune" hidden>
-      <label>neighbor radius <input type="range" id="t-radius" min="0.004" max="0.05" step="0.001" value="0.008"><span id="v-radius">0.008</span></label>
-      <label>min neighbors <input type="range" id="t-minn" min="0" max="8" step="1" value="3"><span id="v-minn">3</span></label>
-      <label>bloom <input type="range" id="t-bloom" min="0" max="3.5" step="0.05" value="0.6"><span id="v-bloom">0.60</span></label>
-      <label>point size <input type="range" id="t-size" min="0.3" max="3" step="0.1" value="0.6"><span id="v-size">0.6</span></label>
-      <label>morph speed <input type="range" id="t-speed" min="0.25" max="2" step="0.05" value="1.0"><span id="v-speed">1.0</span></label>
-      <label>bloom trail <input type="range" id="t-trail" min="1" max="40" step="1" value="8"><span id="v-trail">8</span></label>
-      <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.15" step="0.005" value="0.105"><span id="v-huesh">0.105</span></label>
-      <label>trail chroma <input type="range" id="t-chroma" min="0.9" max="1.3" step="0.01" value="1.26"><span id="v-chroma">1.26</span></label>
-      <label>trail decay <input type="range" id="t-decay" min="0.80" max="1.0" step="0.005" value="0.905"><span id="v-decay">0.905</span></label>
-      <label>morph pacing <input type="range" id="t-pace" min="0" max="2" step="0.05" value="0.45"><span id="v-pace">0.45</span></label>
-      <button type="button" id="t-reset">reset</button>
     </div>
     <div id="about" hidden>
       The sky is a <b>Clifford attractor</b> — a strange attractor from chaos theory,
@@ -315,6 +314,25 @@
       leads the cycle. Chaos isn't disorder; it's structure you couldn't have predicted.
     </div>
   </main>
+
+  <!-- the tune drawer: collapsed by default, floats over the scene,
+       never disturbs the layout -->
+  <button type="button" id="tune-toggle" aria-expanded="false" aria-controls="tune">◦ tune ◦</button>
+  <div id="tune" hidden>
+    <label>neighbor radius <input type="range" id="t-radius" min="0.004" max="0.05" step="0.001" value="0.008"><span id="v-radius">0.008</span></label>
+    <label>min neighbors <input type="range" id="t-minn" min="0" max="8" step="1" value="3"><span id="v-minn">3</span></label>
+    <label>bloom <input type="range" id="t-bloom" min="0" max="3.5" step="0.05" value="0.6"><span id="v-bloom">0.60</span></label>
+    <label>point size <input type="range" id="t-size" min="0.3" max="3" step="0.1" value="0.6"><span id="v-size">0.6</span></label>
+    <label>morph speed <input type="range" id="t-speed" min="0.25" max="2" step="0.05" value="1.0"><span id="v-speed">1.0</span></label>
+    <label>bloom trail <input type="range" id="t-trail" min="1" max="40" step="1" value="8"><span id="v-trail">8</span></label>
+    <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.15" step="0.005" value="0.105"><span id="v-huesh">0.105</span></label>
+    <label>trail chroma <input type="range" id="t-chroma" min="0.9" max="1.3" step="0.01" value="1.26"><span id="v-chroma">1.26</span></label>
+    <label>trail decay <input type="range" id="t-decay" min="0.80" max="1.0" step="0.005" value="0.905"><span id="v-decay">0.905</span></label>
+    <label>morph pacing <input type="range" id="t-pace" min="0" max="2" step="0.05" value="0.45"><span id="v-pace">0.45</span></label>
+    <label>hscale <input type="range" id="t-hscale" min="0.4" max="1.6" step="0.05" value="1.0"><span id="v-hscale">1.00</span></label>
+    <label>vscale <input type="range" id="t-vscale" min="0.4" max="1.5" step="0.05" value="1.0"><span id="v-vscale">1.00</span></label>
+    <button type="button" id="t-reset">reset</button>
+  </div>
 
 <script>
 (function () {
@@ -488,7 +506,7 @@ const MORPH_BASE = 20;
 
 // ── tunables (John's dials) ───────────────────────────────────
 // defaults dialed in by John, 2026-07-24
-const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.105, trailChroma: 1.26, pacing: 0.45, trailDecay: 0.905 };
+const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.105, trailChroma: 1.26, pacing: 0.45, trailDecay: 0.905, hscale: 1.0, vscale: 1.0 };
 let tune = { ...DEFAULTS };
 try { tune = { ...DEFAULTS, ...JSON.parse(localStorage.getItem("chaos-tune") || "{}") }; } catch (e) {}
 
@@ -821,8 +839,8 @@ function stepParticles(a, b, c, d) {
     let t = (ny + SPAN) / (SPAN * 2);          // 0 at attractor bottom → 1 at top
     t = t < 0 ? 0 : t > 1 ? 1 : t;
     const persp = t * Math.sqrt(t);            // ≈ t^1.5 — dense near the horizon
-    positions[o] = nx * viewAspect * 0.85 * (0.50 + 0.50 * persp);   // edge-to-edge sky, cloud shrink preserved
-    positions[o + 1] = Y_HORIZON + (Y_TOP - Y_HORIZON) * persp;
+    positions[o] = nx * viewAspect * 0.85 * tune.hscale * (0.50 + 0.50 * persp);   // edge-to-edge sky, cloud shrink preserved
+    positions[o + 1] = Y_HORIZON + (Y_TOP - Y_HORIZON) * persp * tune.vscale;
     positions[o + 2] = 0;
     let visible = true;
     if (tune.minn > 0) {
@@ -895,6 +913,10 @@ function applyTune() {
   document.getElementById("t-decay").value = tune.trailDecay;
   document.getElementById("v-pace").textContent = tune.pacing.toFixed(2);
   document.getElementById("t-pace").value = tune.pacing;
+  document.getElementById("v-hscale").textContent = tune.hscale.toFixed(2);
+  document.getElementById("t-hscale").value = tune.hscale;
+  document.getElementById("v-vscale").textContent = tune.vscale.toFixed(2);
+  document.getElementById("t-vscale").value = tune.vscale;
   document.getElementById("v-radius").textContent = tune.radius.toFixed(3);
   document.getElementById("v-minn").textContent = tune.minn;
   document.getElementById("v-bloom").textContent = tune.bloomStrength.toFixed(2);
@@ -926,6 +948,8 @@ bind("t-huesh", "trailHue", false, false);
 bind("t-chroma", "trailChroma", false, false);
 bind("t-decay", "trailDecay", false, false);
 bind("t-pace", "pacing", false, false, rebuildWarp);
+bind("t-hscale", "hscale", false, false);
+bind("t-vscale", "vscale", false, false);
 document.getElementById("t-reset").addEventListener("click", () => { tune = { ...DEFAULTS }; rebuildGrid(); applyTune(); });
 const tuneToggle = document.getElementById("tune-toggle");
 const tunePanel = document.getElementById("tune");
