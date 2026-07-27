@@ -806,13 +806,19 @@ function stepParticles(a, b, c, d) {
   }
   // pass 2: place + color; isolated particles go black (invisible under additive)
   const minCount = tune.minn + 1;   // + self
+  // the attractor lives in the SKY, with cloud perspective: forms
+  // compress vertically AND horizontally as they approach the horizon,
+  // the way a cloud bank flattens into the distance
+  const Y_HORIZON = -0.40;   // NDC of the waterline (screen v = 0.30)
+  const Y_TOP = 1.06;
   for (let i = 0; i < COUNT; i++) {
     const o = i * 3;
     const nx = px[i], ny = py[i];
-    // sweep the whole sky — the QR panel floats inside the chaos,
-    // filaments spilling out on every side
-    positions[o] = nx * viewAspect * 0.62;
-    positions[o + 1] = ny * 0.62;
+    let t = (ny + SPAN) / (SPAN * 2);          // 0 at attractor bottom → 1 at top
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const persp = t * Math.sqrt(t);            // ≈ t^1.5 — dense near the horizon
+    positions[o] = nx * viewAspect * 0.62 * (0.32 + 0.68 * persp);
+    positions[o + 1] = Y_HORIZON + (Y_TOP - Y_HORIZON) * persp;
     positions[o + 2] = 0;
     let visible = true;
     if (tune.minn > 0) {
