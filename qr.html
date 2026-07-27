@@ -21,6 +21,7 @@
     --mono: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }   /* author display:flex must not defeat the hidden attribute */
   html, body { height: 100%; }
   body {
     font-family: var(--mono);
