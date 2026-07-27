@@ -295,7 +295,7 @@
       <label>point size <input type="range" id="t-size" min="0.3" max="3" step="0.1" value="0.6"><span id="v-size">0.6</span></label>
       <label>morph speed <input type="range" id="t-speed" min="0.25" max="2" step="0.05" value="1.0"><span id="v-speed">1.0</span></label>
       <label>bloom trail <input type="range" id="t-trail" min="1" max="40" step="1" value="8"><span id="v-trail">8</span></label>
-      <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.15" step="0.005" value="0.015"><span id="v-huesh">0.015</span></label>
+      <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.15" step="0.005" value="0.035"><span id="v-huesh">0.035</span></label>
       <label>trail chroma <input type="range" id="t-chroma" min="0.9" max="1.3" step="0.01" value="1.05"><span id="v-chroma">1.05</span></label>
       <label>morph pacing <input type="range" id="t-pace" min="0" max="2" step="0.05" value="1.0"><span id="v-pace">1.00</span></label>
       <button type="button" id="t-reset">reset</button>
@@ -487,7 +487,7 @@ const MORPH_BASE = 20;
 
 // ── tunables (John's dials) ───────────────────────────────────
 // defaults dialed in by John, 2026-07-24
-const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.015, trailChroma: 1.05, pacing: 1.0 };
+const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.035, trailChroma: 1.05, pacing: 1.0 };
 let tune = { ...DEFAULTS };
 try { tune = { ...DEFAULTS, ...JSON.parse(localStorage.getItem("chaos-tune") || "{}") }; } catch (e) {}
 
@@ -545,7 +545,10 @@ const emaMat = new THREE.ShaderMaterial({
     }
     void main() {
       vec3 prev = hueRotate(texture2D(tPrev, vUv).rgb, hueShift, chromaGain);
-      gl_FragColor = vec4(mix(prev, texture2D(tCur, vUv).rgb, k), 1.0);
+      // new light enters GOLDEN; age alone carries it toward blue
+      float lum = dot(texture2D(tCur, vUv).rgb, vec3(0.2126, 0.7152, 0.0722));
+      vec3 golden = vec3(1.0, 0.78, 0.42) * lum * 1.2;
+      gl_FragColor = vec4(mix(prev, golden, k), 1.0);
     }`,
 });
 const brightMat = new THREE.ShaderMaterial({
@@ -563,66 +566,76 @@ const copyMat = new THREE.ShaderMaterial({
   vertexShader: VS,
   fragmentShader: "uniform sampler2D tex; varying vec2 vUv; void main(){ gl_FragColor = texture2D(tex, vUv); }",
 });
-// the glow is COLORIZED on composite: its brightness maps through a
-// sunset-cloud palette (soft blue → pink → gold → amber → orange) with
-// a slow spatial shimmer — iridescent clouds instead of monochrome haze
+// the glow already carries its color from the aging history (gold → blue);
+// here it is scaled and Reinhard tone-mapped so bright regions stay
+// COLORED instead of summing to white
 const addMat = new THREE.ShaderMaterial({
-  uniforms: { tex: { value: null }, strength: { value: 0.6 }, time: { value: 0 } },
+  uniforms: { tex: { value: null }, strength: { value: 0.6 } },
   vertexShader: VS,
   fragmentShader: `
-    uniform sampler2D tex; uniform float strength; uniform float time; varying vec2 vUv;
-    vec3 sunset(float t) {
-      t = clamp(t, 0.0, 1.0) * 4.0;
-      vec3 c0 = vec3(0.50, 0.69, 0.85);   // soft blue
-      vec3 c1 = vec3(0.95, 0.63, 0.75);   // iridescent pink
-      vec3 c2 = vec3(1.00, 0.82, 0.50);   // gold
-      vec3 c3 = vec3(1.00, 0.69, 0.40);   // amber
-      vec3 c4 = vec3(1.00, 0.56, 0.40);   // orange
-      if (t < 1.0) return mix(c0, c1, t);
-      if (t < 2.0) return mix(c1, c2, t - 1.0);
-      if (t < 3.0) return mix(c2, c3, t - 2.0);
-      return mix(c3, c4, t - 3.0);
-    }
+    uniform sampler2D tex; uniform float strength; varying vec2 vUv;
     void main() {
-      vec3 g = texture2D(tex, vUv).rgb;
-      float lum = dot(g, vec3(0.2126, 0.7152, 0.0722));
-      float phase = lum * 0.55
-        + 0.22 * sin(vUv.x * 5.0 + time * 0.25)
-        + 0.16 * sin(vUv.y * 3.5 - time * 0.17)
-        + 0.10 * sin((vUv.x + vUv.y) * 8.0 + time * 0.11);
-      vec3 tint = sunset(fract(phase * 0.8 + 0.1));
-      gl_FragColor = vec4(tint * lum * strength, 1.0);
+      vec3 g = texture2D(tex, vUv).rgb * strength;
+      g = g / (1.0 + g);
+      gl_FragColor = vec4(g, 1.0);
     }`,
 });
-// direct additive composite of the colored glow
+// screen blending: light over light saturates gracefully instead of
+// clipping to white the way pure addition does
+const SCREEN_BLEND = {
+  blending: THREE.CustomBlending,
+  blendEquation: THREE.AddEquation,
+  blendSrc: THREE.OneMinusDstColorFactor,
+  blendDst: THREE.OneFactor,
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+};
+// direct composite of the colored glow
 const glowAddMat = new THREE.ShaderMaterial({
   uniforms: { tex: { value: null } },
   vertexShader: VS,
   fragmentShader: "uniform sampler2D tex; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(tex, vUv).rgb, 1.0); }",
-  blending: THREE.AdditiveBlending,
-  transparent: true,
-  depthTest: false,
-  depthWrite: false,
+  ...SCREEN_BLEND,
 });
-// the ocean remembers the sky: colored glow mirrored about the horizon,
-// blue-shifted and fading with depth
+// the ocean reflects: perspective-compressed toward the horizon, smeared
+// vertically into a glitter column (calm-water specular elongates
+// vertically — wave slopes scatter far more up-down than sideways),
+// softly blurred horizontally, with a slow wave-ripple wobble
 const reflectMat = new THREE.ShaderMaterial({
-  uniforms: { tex: { value: null }, horizon: { value: 0.30 } },
+  uniforms: { tex: { value: null }, horizon: { value: 0.30 }, time: { value: 0 } },
   vertexShader: VS,
   fragmentShader: `
-    uniform sampler2D tex; uniform float horizon; varying vec2 vUv;
+    uniform sampler2D tex; uniform float horizon; uniform float time; varying vec2 vUv;
     void main() {
       if (vUv.y >= horizon) { gl_FragColor = vec4(0.0); return; }
-      float depth = (horizon - vUv.y) / horizon;          // 0 at waterline → 1 at bottom
-      vec2 muv = vec2(vUv.x, horizon + (horizon - vUv.y)); // mirror about the waterline
-      vec3 g = texture2D(tex, muv).rgb;
-      float fade = (1.0 - depth * 0.75) * 0.45;
-      gl_FragColor = vec4(g * vec3(0.75, 0.85, 1.08) * fade, 1.0);
+      float d = (horizon - vUv.y) / horizon;               // 0 waterline → 1 bottom
+      // perspective compression: deep water reflects high sky, squeezed
+      float src = horizon + pow(d, 0.6) * (1.0 - horizon);
+      // wave ripple: horizontal wobble growing with depth
+      float wob = sin(vUv.y * 90.0 + time * 1.3) * 0.006 * d
+                + sin(vUv.y * 41.0 - time * 0.7) * 0.004 * d;
+      vec3 acc = vec3(0.0);
+      float wsum = 0.0;
+      for (int i = -2; i <= 2; i++) {
+        float fy = float(i);
+        float wv = 1.0 - abs(fy) * 0.28;      // vertical smear — the glitter column
+        float oy = fy * 0.012 * (0.3 + d);
+        for (int j = -1; j <= 1; j++) {
+          float fx = float(j);
+          float wh = 1.0 - abs(fx) * 0.45;    // gentle horizontal softening
+          float ox = fx * 0.010 * (0.2 + d) + wob;
+          acc += texture2D(tex, vec2(vUv.x + ox, src + oy)).rgb * (wv * wh);
+          wsum += wv * wh;
+        }
+      }
+      vec3 g = (acc / wsum) * vec3(0.8, 0.88, 1.1);
+      float fade = (1.0 - d * 0.7) * 0.55;
+      g = g * fade;
+      g = g / (1.0 + g);
+      gl_FragColor = vec4(g, 1.0);
     }`,
-  blending: THREE.AdditiveBlending,
-  transparent: true,
-  depthTest: false,
-  depthWrite: false,
+  ...SCREEN_BLEND,
 });
 
 let viewAspect = 1;
@@ -661,7 +674,7 @@ function renderFrame() {
   emaMat.uniforms.tPrev.value = rtHistA.texture;
   emaMat.uniforms.tCur.value = rtParticles.texture;
   emaMat.uniforms.k.value = 1 / tune.trail;
-  emaMat.uniforms.hueShift.value = tune.trailHue;
+  emaMat.uniforms.hueShift.value = -tune.trailHue;   // negative = the sunset direction: gold → pink → violet → blue
   emaMat.uniforms.chromaGain.value = tune.trailChroma;
   drawPass(emaMat, rtHistB);
   const swap = rtHistA; rtHistA = rtHistB; rtHistB = swap;   // A holds newest
@@ -831,7 +844,7 @@ function stepParticles(a, b, c, d) {
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.1);
   elapsed += dt;
-  addMat.uniforms.time.value = elapsed;
+  reflectMat.uniforms.time.value = elapsed;
   hue += dt * 0.028 * tune.speed;   // the ChaosRenders color-shift mode — gentle, ~35s per full palette cycle
   morph += (dt * tune.speed) / MORPH_BASE;
   if (morph >= 1) {
