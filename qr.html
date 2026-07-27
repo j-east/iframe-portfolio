@@ -446,13 +446,13 @@ const material = new THREE.PointsMaterial({
 const particleScene = new THREE.Scene();
 particleScene.add(new THREE.Points(geometry, material));
 
-// palette (the site's own) as vec3s
+// particle palette — sunset family, matching sky and glow
 const PALETTE = [
-  [1.0, 0.70, 0.40],   // amber glow
-  [1.0, 0.60, 0.50],   // salmon
-  [0.50, 0.85, 0.85],  // cathode cyan
-  [0.50, 1.0, 0.53],   // terminal green
-  [1.0, 0.80, 0.70],   // peach haze
+  [1.00, 0.72, 0.42],  // amber
+  [1.00, 0.60, 0.50],  // salmon-orange
+  [0.97, 0.65, 0.75],  // iridescent pink
+  [0.58, 0.72, 0.92],  // soft dusk blue
+  [1.00, 0.82, 0.55],  // gold
 ];
 function pal(t) {
   t = ((t % 1) + 1) % 1;
@@ -522,7 +522,7 @@ const mkRT = (w, h, hf) => new THREE.WebGLRenderTarget(Math.max(2, w), Math.max(
   depthBuffer: false,
   type: hf ? THREE.HalfFloatType : THREE.UnsignedByteType,
 });
-let rtScene, rtParticles, rtHistA, rtHistB, rtBright, rtBlurA, rtBlurB;
+let rtScene, rtParticles, rtHistA, rtHistB, rtBright, rtBlurA, rtBlurB, rtGlow;
 const VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
 const emaMat = new THREE.ShaderMaterial({
   uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 } },
@@ -574,6 +574,32 @@ const addMat = new THREE.ShaderMaterial({
       vec3 tint = sunset(fract(phase * 0.8 + 0.1));
       gl_FragColor = vec4(tint * lum * strength, 1.0);
     }`,
+});
+// direct additive composite of the colored glow
+const glowAddMat = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: null } },
+  vertexShader: VS,
+  fragmentShader: "uniform sampler2D tex; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(tex, vUv).rgb, 1.0); }",
+  blending: THREE.AdditiveBlending,
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+});
+// the ocean remembers the sky: colored glow mirrored about the horizon,
+// blue-shifted and fading with depth
+const reflectMat = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: null }, horizon: { value: 0.30 } },
+  vertexShader: VS,
+  fragmentShader: `
+    uniform sampler2D tex; uniform float horizon; varying vec2 vUv;
+    void main() {
+      if (vUv.y >= horizon) { gl_FragColor = vec4(0.0); return; }
+      float depth = (horizon - vUv.y) / horizon;          // 0 at waterline → 1 at bottom
+      vec2 muv = vec2(vUv.x, horizon + (horizon - vUv.y)); // mirror about the waterline
+      vec3 g = texture2D(tex, muv).rgb;
+      float fade = (1.0 - depth * 0.75) * 0.45;
+      gl_FragColor = vec4(g * vec3(0.75, 0.85, 1.08) * fade, 1.0);
+    }`,
   blending: THREE.AdditiveBlending,
   transparent: true,
   depthTest: false,
@@ -587,10 +613,10 @@ function resize() {
   viewAspect = w / h;
   camera.left = -viewAspect; camera.right = viewAspect;
   camera.updateProjectionMatrix();
-  skyMesh.scale.set(viewAspect * 2.05, 2.05, 1);
+  skyMesh.scale.set(viewAspect, 1, 1);   // exact fit: full sunset visible, ocean gets its ~30%
   const dpr = renderer.getPixelRatio();
   const W = Math.round(w * dpr), H = Math.round(h * dpr);
-  [rtScene, rtParticles, rtHistA, rtHistB, rtBright, rtBlurA, rtBlurB].forEach(rt => rt && rt.dispose());
+  [rtScene, rtParticles, rtHistA, rtHistB, rtBright, rtBlurA, rtBlurB, rtGlow].forEach(rt => rt && rt.dispose());
   rtScene = mkRT(W, H);
   rtParticles = mkRT(W >> 1, H >> 1, true);
   rtHistA = mkRT(W >> 1, H >> 1, true);
@@ -598,6 +624,7 @@ function resize() {
   rtBright = mkRT(W >> 2, H >> 2, true);
   rtBlurA = mkRT(W >> 2, H >> 2, true);
   rtBlurB = mkRT(W >> 2, H >> 2, true);
+  rtGlow = mkRT(W >> 2, H >> 2, true);
   blurMat.uniforms.texel.value.set(1 / (W >> 2), 1 / (H >> 2));
 }
 
@@ -622,12 +649,17 @@ function renderFrame() {
   drawPass(brightMat, rtBright);
   blurMat.uniforms.tex.value = rtBright.texture; blurMat.uniforms.dir.value.set(1, 0); drawPass(blurMat, rtBlurA);
   blurMat.uniforms.tex.value = rtBlurA.texture; blurMat.uniforms.dir.value.set(0, 1); drawPass(blurMat, rtBlurB);
-  // composite: crisp base + smoothed glow
-  copyMat.uniforms.tex.value = rtScene.texture;
-  drawPass(copyMat, null);
+  // colorize the glow through the sunset-cloud palette
   addMat.uniforms.tex.value = rtBlurB.texture;
   addMat.uniforms.strength.value = tune.bloomStrength * 1.5;
-  drawPass(addMat, null, true);
+  drawPass(addMat, rtGlow);
+  // composite: crisp base + glow + its reflection in the water
+  copyMat.uniforms.tex.value = rtScene.texture;
+  drawPass(copyMat, null);
+  glowAddMat.uniforms.tex.value = rtGlow.texture;
+  drawPass(glowAddMat, null, true);
+  reflectMat.uniforms.tex.value = rtGlow.texture;
+  drawPass(reflectMat, null, true);
 }
 addEventListener("resize", resize);
 resize();
