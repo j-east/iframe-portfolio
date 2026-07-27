@@ -532,10 +532,10 @@ const VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position
 // old ones while the OLD frames hue-shift — trails change color as
 // they age instead of merely fading
 const emaMat = new THREE.ShaderMaterial({
-  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 }, hueShift: { value: 0.015 }, chromaGain: { value: 1.05 }, decay: { value: 0.96 } },
+  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 }, hueShift: { value: 0.015 }, chromaGain: { value: 1.05 }, decay: { value: 0.96 }, horizon: { value: 0.30 } },
   vertexShader: VS,
   fragmentShader: `
-    uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; uniform float hueShift; uniform float chromaGain; uniform float decay; varying vec2 vUv;
+    uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; uniform float hueShift; uniform float chromaGain; uniform float decay; uniform float horizon; varying vec2 vUv;
     vec3 hueRotate(vec3 c, float a, float gain) {
       const mat3 toYIQ = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312);
       const mat3 toRGB = mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703);
@@ -551,7 +551,10 @@ const emaMat = new THREE.ShaderMaterial({
       // new light enters GOLDEN; age alone carries it toward blue
       float lum = dot(texture2D(tCur, vUv).rgb, vec3(0.2126, 0.7152, 0.0722));
       vec3 golden = vec3(1.0, 0.78, 0.42) * lum * 1.2;
-      gl_FragColor = vec4(mix(prev, golden, k), 1.0);
+      // the glow is a SKY phenomenon: below the waterline the history
+      // holds nothing, so old residue can never linger over the water
+      float sky = step(horizon, vUv.y);
+      gl_FragColor = vec4(mix(prev, golden, k) * sky, 1.0);
     }`,
 });
 const brightMat = new THREE.ShaderMaterial({
@@ -594,11 +597,12 @@ const SCREEN_BLEND = {
   depthTest: false,
   depthWrite: false,
 };
-// direct composite of the colored glow
+// direct composite of the colored glow — sky only; the water gets its
+// light exclusively through the reflection pass
 const glowAddMat = new THREE.ShaderMaterial({
-  uniforms: { tex: { value: null } },
+  uniforms: { tex: { value: null }, horizon: { value: 0.30 } },
   vertexShader: VS,
-  fragmentShader: "uniform sampler2D tex; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(tex, vUv).rgb, 1.0); }",
+  fragmentShader: "uniform sampler2D tex; uniform float horizon; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(tex, vUv).rgb * step(horizon, vUv.y), 1.0); }",
   ...SCREEN_BLEND,
 });
 // the ocean reflects: perspective-compressed toward the horizon, smeared
