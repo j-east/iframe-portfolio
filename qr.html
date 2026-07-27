@@ -295,7 +295,9 @@
       <label>point size <input type="range" id="t-size" min="0.3" max="3" step="0.1" value="0.6"><span id="v-size">0.6</span></label>
       <label>morph speed <input type="range" id="t-speed" min="0.25" max="2" step="0.05" value="1.0"><span id="v-speed">1.0</span></label>
       <label>bloom trail <input type="range" id="t-trail" min="1" max="40" step="1" value="8"><span id="v-trail">8</span></label>
-      <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.06" step="0.002" value="0.015"><span id="v-huesh">0.015</span></label>
+      <label>trail hue shift <input type="range" id="t-huesh" min="0" max="0.15" step="0.005" value="0.015"><span id="v-huesh">0.015</span></label>
+      <label>trail chroma <input type="range" id="t-chroma" min="0.9" max="1.3" step="0.01" value="1.05"><span id="v-chroma">1.05</span></label>
+      <label>morph pacing <input type="range" id="t-pace" min="0" max="2" step="0.05" value="1.0"><span id="v-pace">1.00</span></label>
       <button type="button" id="t-reset">reset</button>
     </div>
     <div id="about" hidden>
@@ -485,7 +487,7 @@ const MORPH_BASE = 20;
 
 // ── tunables (John's dials) ───────────────────────────────────
 // defaults dialed in by John, 2026-07-24
-const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.015 };
+const DEFAULTS = { radius: 0.008, minn: 3, bloomStrength: 0.6, size: 0.6, speed: 1.0, trail: 8, trailHue: 0.015, trailChroma: 1.05, pacing: 1.0 };
 let tune = { ...DEFAULTS };
 try { tune = { ...DEFAULTS, ...JSON.parse(localStorage.getItem("chaos-tune") || "{}") }; } catch (e) {}
 
@@ -529,20 +531,20 @@ const VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position
 // old ones while the OLD frames hue-shift — trails change color as
 // they age instead of merely fading
 const emaMat = new THREE.ShaderMaterial({
-  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 }, hueShift: { value: 0.015 } },
+  uniforms: { tPrev: { value: null }, tCur: { value: null }, k: { value: 0.25 }, hueShift: { value: 0.015 }, chromaGain: { value: 1.05 } },
   vertexShader: VS,
   fragmentShader: `
-    uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; uniform float hueShift; varying vec2 vUv;
-    vec3 hueRotate(vec3 c, float a) {
+    uniform sampler2D tPrev; uniform sampler2D tCur; uniform float k; uniform float hueShift; uniform float chromaGain; varying vec2 vUv;
+    vec3 hueRotate(vec3 c, float a, float gain) {
       const mat3 toYIQ = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312);
       const mat3 toRGB = mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703);
       vec3 yiq = toYIQ * c;
       float h = atan(yiq.z, yiq.y) + a;
-      float chroma = length(yiq.yz);
+      float chroma = min(length(yiq.yz) * gain, 0.6);   // clamp: compounding gain can't run away
       return max(toRGB * vec3(yiq.x, chroma * cos(h), chroma * sin(h)), 0.0);
     }
     void main() {
-      vec3 prev = hueRotate(texture2D(tPrev, vUv).rgb, hueShift);
+      vec3 prev = hueRotate(texture2D(tPrev, vUv).rgb, hueShift, chromaGain);
       gl_FragColor = vec4(mix(prev, texture2D(tCur, vUv).rgb, k), 1.0);
     }`,
 });
@@ -660,6 +662,7 @@ function renderFrame() {
   emaMat.uniforms.tCur.value = rtParticles.texture;
   emaMat.uniforms.k.value = 1 / tune.trail;
   emaMat.uniforms.hueShift.value = tune.trailHue;
+  emaMat.uniforms.chromaGain.value = tune.trailChroma;
   drawPass(emaMat, rtHistB);
   const swap = rtHistA; rtHistA = rtHistB; rtHistB = swap;   // A holds newest
   // bloom chain fed by the smoothed history, not the live frame
@@ -737,13 +740,17 @@ function stepWarpJob(job, samplesPerCall) {
     job.prevGrid = g;
     job.i++;
   }
-  if (job.i >= W_SAMPLES && !job.table) {
-    const T = new Float32Array(W_SAMPLES);
-    let acc = 0;
-    for (let i = 1; i < W_SAMPLES; i++) { acc += job.diffs[i] + 0.02; T[i] = acc; }
-    for (let i = 0; i < W_SAMPLES; i++) T[i] /= acc;
-    job.table = T;
-  }
+  if (job.i >= W_SAMPLES && !job.table) job.table = true;   // diffs complete
+}
+// build a warp table from measured diffs; gamma is the pacing exponent —
+// 1 = constant perceptual speed, >1 over-weights snap zones (they play
+// in slow motion), <1 softens the correction
+function tableFromDiffs(diffs, gamma) {
+  const T = new Float32Array(W_SAMPLES);
+  let acc = 0;
+  for (let i = 1; i < W_SAMPLES; i++) { acc += Math.pow(diffs[i], gamma) + 0.02; T[i] = acc; }
+  for (let i = 0; i < W_SAMPLES; i++) T[i] /= acc;
+  return T;
 }
 function warpLookup(table, p) {
   if (!table) return p;
@@ -754,7 +761,12 @@ function warpLookup(table, p) {
 }
 const firstJob = makeWarpJob(SETS[0], SETS[1]);
 stepWarpJob(firstJob, W_SAMPLES);          // first segment: computed up front (one-time ~5ms)
-let warpTable = firstJob.table;
+let activeDiffs = firstJob.diffs;
+let warpTable = null;
+function rebuildWarp() {
+  warpTable = tune.pacing <= 0.01 ? null : tableFromDiffs(activeDiffs, Math.max(0.3, tune.pacing));
+}
+rebuildWarp();
 let nextWarpJob = makeWarpJob(SETS[1], SETS[2 % SETS.length]);
 
 function stepParticles(a, b, c, d) {
@@ -828,7 +840,8 @@ function frame() {
     cur = target;
     target = SETS[(setIdx + 1) % SETS.length].slice();
     stepWarpJob(nextWarpJob, W_SAMPLES);   // ensure complete (it long since is)
-    warpTable = nextWarpJob.table;
+    activeDiffs = nextWarpJob.diffs;
+    rebuildWarp();
     nextWarpJob = makeWarpJob(target, SETS[(setIdx + 2) % SETS.length]);
   }
   stepWarpJob(nextWarpJob, 1);   // render ahead: one probe sample per frame
@@ -849,6 +862,10 @@ function applyTune() {
   document.getElementById("t-trail").value = tune.trail;
   document.getElementById("v-huesh").textContent = tune.trailHue.toFixed(3);
   document.getElementById("t-huesh").value = tune.trailHue;
+  document.getElementById("v-chroma").textContent = tune.trailChroma.toFixed(2);
+  document.getElementById("t-chroma").value = tune.trailChroma;
+  document.getElementById("v-pace").textContent = tune.pacing.toFixed(2);
+  document.getElementById("t-pace").value = tune.pacing;
   document.getElementById("v-radius").textContent = tune.radius.toFixed(3);
   document.getElementById("v-minn").textContent = tune.minn;
   document.getElementById("v-bloom").textContent = tune.bloomStrength.toFixed(2);
@@ -862,11 +879,12 @@ function applyTune() {
   localStorage.setItem("chaos-tune", JSON.stringify(tune));
   if (reduced) renderFrame();
 }
-function bind(id, key, isInt, needsGrid) {
+function bind(id, key, isInt, needsGrid, after) {
   document.getElementById(id).addEventListener("input", (e) => {
     tune[key] = isInt ? parseInt(e.target.value, 10) : parseFloat(e.target.value);
     if (needsGrid) rebuildGrid();
     applyTune();
+    if (after) after();
   });
 }
 bind("t-radius", "radius", false, true);
@@ -876,6 +894,8 @@ bind("t-size", "size", false, false);
 bind("t-speed", "speed", false, false);
 bind("t-trail", "trail", true, false);
 bind("t-huesh", "trailHue", false, false);
+bind("t-chroma", "trailChroma", false, false);
+bind("t-pace", "pacing", false, false, rebuildWarp);
 document.getElementById("t-reset").addEventListener("click", () => { tune = { ...DEFAULTS }; rebuildGrid(); applyTune(); });
 const tuneToggle = document.getElementById("tune-toggle");
 const tunePanel = document.getElementById("tune");
