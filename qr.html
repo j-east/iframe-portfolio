@@ -821,7 +821,7 @@ function stepParticles(a, b, c, d) {
     let t = (ny + SPAN) / (SPAN * 2);          // 0 at attractor bottom → 1 at top
     t = t < 0 ? 0 : t > 1 ? 1 : t;
     const persp = t * Math.sqrt(t);            // ≈ t^1.5 — dense near the horizon
-    positions[o] = nx * viewAspect * 0.62 * (0.32 + 0.68 * persp);
+    positions[o] = nx * viewAspect * 0.85 * (0.50 + 0.50 * persp);   // edge-to-edge sky, cloud shrink preserved
     positions[o + 1] = Y_HORIZON + (Y_TOP - Y_HORIZON) * persp;
     positions[o + 2] = 0;
     let visible = true;
